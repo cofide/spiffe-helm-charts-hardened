@@ -154,6 +154,8 @@ persistence:
   hostPath: ""
 
 dataStore:
+  ## @param dataStore.plugin The data store plugin to use. Currently only "connect" and "sql" are supported.
+  plugin: sql
   sql:
     ## @param dataStore.sql.databaseType Other supported databases are ["postgres", "mysql", "aws_postgresql", "aws_mysql"]. Note: aws type databases are still experimental
     databaseType: sqlite3

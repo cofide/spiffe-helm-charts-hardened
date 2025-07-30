@@ -282,6 +282,16 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{- define "has-any-upstreamauthority" -}}
+{{- $has := false -}}
+{{- range .Values.upstreamAuthority -}}
+  {{- if eq (.enabled | toString) "true" -}}
+    {{- $has = true -}}
+  {{- end -}}
+{{- end -}}
+{{ ternary "true" "" $has }}
+{{- end }}
+
 {{/*
 Tornjak specific section
 */}}
