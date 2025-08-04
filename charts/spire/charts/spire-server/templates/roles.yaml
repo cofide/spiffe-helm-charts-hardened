@@ -101,7 +101,7 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: configmap-manager
+  name: {{ include "spire-server.fullname" . }}-configmap-manager
   namespace: {{ $namespace }}
 rules:
 - apiGroups: [""]
@@ -112,10 +112,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: configmap-manager-binding
+  name: {{ include "spire-server.fullname" . }}-configmap-manager
   namespace: {{ $namespace }}
 {{ $subject }}
 roleRef:
   kind: Role
-  name: configmap-manager
+  name: {{ include "spire-server.fullname" . }}-configmap-manager
   apiGroup: rbac.authorization.k8s.io
