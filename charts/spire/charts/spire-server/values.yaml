@@ -15,8 +15,8 @@ replicaCount: 1
 ## @param image.tag Overrides the image tag whose default is the chart appVersion
 ##
 image:
-  registry: ghcr.io
-  repository: spiffe/spire-server
+  registry: 010438484483.dkr.ecr.eu-west-1.amazonaws.com
+  repository: cofide/spire-server
   pullPolicy: IfNotPresent
   tag: ""
 
