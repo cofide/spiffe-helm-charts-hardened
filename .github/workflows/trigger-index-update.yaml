@@ -1,0 +1,32 @@
+# This workflow is triggered by a completed GitHub pages build for this repository.
+# It sends a repository dispatch event to the helm-charts repository, which
+# causes it to aggregate the Helm index.yaml from this repository with its own.
+name: Trigger index update
+on:
+  workflow_run:
+    workflows:
+      - pages-build-deployment
+    types:
+      - completed
+
+jobs:
+  trigger:
+    name: Trigger index update
+    runs-on: ubuntu-latest
+    steps:
+      # The token requires contents:write on the remote repository in order to
+      # trigger a repository dispatch.
+      - name: Trigger index update in helm-charts repository
+        run: |
+          curl \
+            -X POST \
+            --fail \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.HELM_CHARTS_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository_owner }}/helm-charts/dispatches \
+            -d '{
+              "event_type": "charts-updated",
+              "client_payload": {
+                "repository": "${{ github.repository }}"
+              }
+            }'

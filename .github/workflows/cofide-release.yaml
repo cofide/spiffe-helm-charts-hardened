@@ -1,0 +1,28 @@
+# This workflow releases charts to the GitHub pages site for this repository.
+# See also trigger-index-update.yml.
+name: publish-helm-chart
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Run chart-releaser to package and release Helm charts
+        uses: helm/chart-releaser-action@v1.7.0
+        with:
+          charts_dir: charts
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
