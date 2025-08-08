@@ -1,25 +1,18 @@
 apiVersion: v2
 name: spire
 description: >
-  A Helm chart for deploying the complete Spire stack including: spire-server, spire-agent, spiffe-csi-driver, spiffe-oidc-discovery-provider and spire-controller-manager.
+  A Helm chart for deploying the complete Cofide SPIRE stack including: spire-server, spire-agent, spiffe-csi-driver, and spiffe-oidc-discovery-provider.
 type: application
-version: 0.26.0-cofide.0
+version: 0.26.0-cofide.1
 appVersion: "1.12.4"
-keywords: ["spiffe", "spire", "spire-server", "spire-agent", "oidc", "spire-controller-manager"]
-home: https://github.com/spiffe/helm-charts-hardened/tree/main/charts/spire
+keywords: ["spiffe", "spire", "spire-server", "spire-agent", "oidc"]
+home: https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
 sources:
-  - https://github.com/spiffe/helm-charts-hardened/tree/main/charts/spire
+  - https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
 icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
 maintainers:
-  - name: marcofranssen
-    email: marco.franssen@gmail.com
-    url: https://marcofranssen.nl
-  - name: kfox1111
-    email: Kevin.Fox@pnnl.gov
-  - name: faisal-memon
-    email: fymemon@yahoo.com
-  - name: edwbuck
-    email: edwbuck@gmail.com
+  - name: Cofide
+    url: https://cofide.io
 kubeVersion: ">=1.21.0-0"
 dependencies:
   - name: spire-lib
