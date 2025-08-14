@@ -1,0 +1,7 @@
+spire-server:
+  image:
+    registry: ghcr.io
+    repository: spiffe/spire-server
+    # NOTE(Cofide): The version here must be in sync with the upstream Chart.yaml.
+    # It ensures that integration tests can pull the image.
+    tag: 1.12.4

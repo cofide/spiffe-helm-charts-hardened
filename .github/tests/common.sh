@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# NOTE(Cofide): The version here must be in sync with the upstream Chart.yaml.
+# It ensures that integration tests can pull the image.
+UPSTREAM_SPIRE_SERVER_VERSION="1.12.4"
+
 GITHUB_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-/tmp/summary}"
 
 get_namespace_details () {
@@ -105,6 +109,12 @@ global:
       country: US
       organization: Production
       commonName: production.other
+# NOTE(Cofide): Use the upstream server image to avoid authentication.
+spire-server:
+  image:
+    registry: ghcr.io
+    repository: spiffe/spire-server
+    tag: $UPSTREAM_SPIRE_SERVER_VERSION
 EOF
 echo "/tmp/$$.example-your-values.yaml"
 }

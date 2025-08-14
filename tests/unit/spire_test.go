@@ -15,6 +15,7 @@ func ValueStringRender(chart *helmchart.Chart, values string) (map[string]string
 	if err != nil {
 		return nil, err
 	}
+	setImageRegistry(v)
 	ro := helmutil.ReleaseOptions{Name: "spire", Namespace: "spire-server", Revision: 1, IsUpgrade: false, IsInstall: true}
 	v, err = helmutil.ToRenderValues(chart, v, ro, helmutil.DefaultCapabilities)
 	if err != nil {
@@ -22,6 +23,19 @@ func ValueStringRender(chart *helmchart.Chart, values string) (map[string]string
 	}
 	objs, err := helmengine.Render(chart, v)
 	return objs, err
+}
+
+// setImageRegistry overrides Helm values to pass the Cofide registry validation.
+func setImageRegistry(v helmutil.Values) {
+	if v["spire-server"] == nil {
+		v["spire-server"] = map[string]any{}
+	}
+	spireServer := v["spire-server"].(map[string]any)
+	if spireServer["image"] == nil {
+		spireServer["image"] = map[string]any{}
+	}
+	image := spireServer["image"].(map[string]any)
+	image["registry"] = any("registry.example.org")
 }
 
 var _ = Describe("Spire", func() {

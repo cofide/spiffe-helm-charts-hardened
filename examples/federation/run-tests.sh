@@ -57,9 +57,11 @@ kubectl create namespace spire-mgmt --dry-run=client -o yaml | kubectl apply -f 
 kubectl label namespace spire-mgmt pod-security.kubernetes.io/enforce=restricted || true
 
 helm upgrade --install --namespace spire-mgmt --values "${SCRIPTPATH}/a-values.yaml" \
+  --values "${TESTDIR}/upstream-image-values.yaml" \
   --wait spire-a charts/spire
 
 helm upgrade --install --namespace spire-mgmt --values "${SCRIPTPATH}/b-values.yaml" \
+  --values "${TESTDIR}/upstream-image-values.yaml" \
   --wait spire-b charts/spire
 
 kubectl exec -it -n spire-server spire-a-server-0 -c spire-server -- spire-server bundle show -format spiffe | kubectl exec -i -n spire-server spire-b-server-0 -c spire-server -- spire-server bundle set -format spiffe -id spiffe://a-org.local
