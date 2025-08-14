@@ -25,7 +25,7 @@ jobs:
 
       - name: Cofide-ify Helm charts
         run: |
-          python3 cofide-ify.py
+          python3 .github/workflows/cofide-ify.py
 
       - name: Configure Git
         run: |
