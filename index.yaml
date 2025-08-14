@@ -37,6 +37,54 @@ entries:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
     appVersion: 1.12.4
+    created: "2025-08-14T10:45:17.189866146Z"
+    dependencies:
+    - name: spire-lib
+      repository: file://./charts/spire-lib
+      version: 0.1.0
+    - condition: spire-server.enabled
+      name: spire-server
+      repository: file://./charts/spire-server
+      version: 0.1.0
+    - condition: spire-agent.enabled
+      name: spire-agent
+      repository: file://./charts/spire-agent
+      version: 0.1.0
+    - condition: spiffe-csi-driver.enabled
+      name: spiffe-csi-driver
+      repository: file://./charts/spiffe-csi-driver
+      version: 0.1.0
+    - condition: spiffe-oidc-discovery-provider.enabled
+      name: spiffe-oidc-discovery-provider
+      repository: file://./charts/spiffe-oidc-discovery-provider
+      version: 0.1.0
+    description: 'A Helm chart for deploying the complete Cofide SPIRE stack including:
+      spire-server, spire-agent, spiffe-csi-driver, and spiffe-oidc-discovery-provider. '
+    digest: 9877739a5e79cdfa4669e0b36c1e5e2358bfed1d494446ee8a953b6b1d8fd119
+    home: https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
+    icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
+    keywords:
+    - spiffe
+    - spire
+    - spire-server
+    - spire-agent
+    - oidc
+    kubeVersion: '>=1.21.0-0'
+    maintainers:
+    - name: Cofide
+      url: https://cofide.io
+    name: spire
+    sources:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
+    type: application
+    urls:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-0.26.0-cofide.1/spire-0.26.0-cofide.1.tgz
+    version: 0.26.0-cofide.1
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: 1.12.4
     created: "2025-08-08T07:59:08.194894536Z"
     dependencies:
     - name: spire-lib
@@ -115,6 +163,25 @@ entries:
     - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-0.26.0-cofide.0/spire-0.26.0-cofide.0.tgz
     version: 0.26.0-cofide.0
   spire-crds:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-08-14T10:45:17.426829853Z"
+    description: 'A Helm chart for deploying the Spire CRDS '
+    digest: 7644591653403f60031c215cdabec5647f6f8e7603f297a27f3e08d1c4e60b50
+    home: https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire-crds
+    icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
+    keywords:
+    - spire-crds
+    maintainers:
+    - name: Cofide
+      url: https://cofide.io
+    name: spire-crds
+    sources:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire-crds
+    type: application
+    urls:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-crds-0.5.0-cofide.1/spire-crds-0.5.0-cofide.1.tgz
+    version: 0.5.0-cofide.1
   - apiVersion: v2
     appVersion: 0.0.1
     created: "2025-08-08T07:59:08.325457764Z"
@@ -268,4 +335,4 @@ entries:
     urls:
     - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-nested-0.26.0/spire-nested-0.26.0.tgz
     version: 0.26.0
-generated: "2025-08-08T07:59:08.506324648Z"
+generated: "2025-08-14T10:45:17.426852044Z"
