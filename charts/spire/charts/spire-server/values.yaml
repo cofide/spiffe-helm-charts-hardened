@@ -228,6 +228,8 @@ adminIDs: []
 auditLogEnabled: false
 ## @param logLevel The log level, valid values are "debug", "info", "warn", and "error"
 logLevel: info
+## @param logFormat The log format, valid values are "text" and "json"
+logFormat: text
 ## @param jwtIssuer The JWT issuer domain. Defaults to oidc-discovery.$trustDomain if unset
 jwtIssuer: ""
 
@@ -489,7 +491,8 @@ upstreamAuthority:
     ## @param upstreamAuthority.vault.namespace Name of the Vault namespace. This is only available in the Vault Enterprise.
     namespace: ""
     ## @param upstreamAuthority.vault.pkiMountPoint Name of the mount point where PKI secret engine is mounted
-    pkiMountPoint: "pki"
+    pkiMountPoint:
+      "pki"
       ## @param upstreamAuthority.vault.insecureSkipVerify If true, caCert options are ignored and Spire accepts any server certificates claiming to be Vault
     insecureSkipVerify: false
     caCert:
@@ -811,7 +814,7 @@ externalControllerManagers:
   ## @param externalControllerManagers.clusters [object] A dictionary of clusters to add with optional overrides. If empty, all clusters defined in kubeConfigs will be used.
   clusters: {}
   # clustera:
-      # Should match the name of the config in the kubeConfigs section
+  # Should match the name of the config in the kubeConfigs section
   #   kubeConfigName: foo
   #   reconcile:
   #     clusterStaticEntries: true
