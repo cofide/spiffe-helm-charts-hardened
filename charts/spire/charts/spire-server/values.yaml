@@ -491,9 +491,8 @@ upstreamAuthority:
     ## @param upstreamAuthority.vault.namespace Name of the Vault namespace. This is only available in the Vault Enterprise.
     namespace: ""
     ## @param upstreamAuthority.vault.pkiMountPoint Name of the mount point where PKI secret engine is mounted
-    pkiMountPoint:
-      "pki"
-      ## @param upstreamAuthority.vault.insecureSkipVerify If true, caCert options are ignored and Spire accepts any server certificates claiming to be Vault
+    pkiMountPoint: "pki"
+    ## @param upstreamAuthority.vault.insecureSkipVerify If true, caCert options are ignored and Spire accepts any server certificates claiming to be Vault
     insecureSkipVerify: false
     caCert:
       ## @param upstreamAuthority.vault.caCert.type Type of resource representing the Vault server certificate, options are 'Secret' or 'Configmap', the item must be named `ca.crt`
