@@ -26,6 +26,12 @@ namespaceOverride: ""
 ## @param annotations [object] Annotations for the deployment
 annotations: {}
 
+## @param labels [object] Labels for the deployment
+labels: {}
+  # if you configured your controller manager to register pods based on labels, you need to add these labels here too
+  # For instance:
+  # spiffe.io/spiffe-id: "true"
+
 image:
   ## @param image.registry The OCI registry to pull the image from
   ## @param image.repository The repository within the registry
@@ -53,7 +59,7 @@ spiffeHelper:
     registry: ghcr.io
     repository: spiffe/spiffe-helper
     pullPolicy: IfNotPresent
-    tag: 0.10.0
+    tag: 0.10.1
   ## @param spiffeHelper.resources [object] Resource requests and limits
   resources: {}
 
@@ -82,6 +88,8 @@ service:
     https: 443
   annotations: {}
   # external-dns.alpha.kubernetes.io/hostname: oidc-discovery.example.org
+  ## @param service.loadBalancerIP IP address to assign to load balancer (if supported)
+  loadBalancerIP: ""
 
 configMap:
   ## @param configMap.annotations [object] Annotations to add to the SPIFFE OIDC Discovery Provider ConfigMap
@@ -176,7 +184,7 @@ insecureScheme:
       registry: docker.io
       repository: nginxinc/nginx-unprivileged
       pullPolicy: IfNotPresent
-      tag: 1.29.0-alpine
+      tag: 1.29.1-alpine
     ## @param insecureScheme.nginx.ipMode IP modes supported by the cluster. Must be one of [ipv4, ipv6, both]
     ipMode: both
     ## @param insecureScheme.nginx.resources Resource requests and limits
@@ -346,7 +354,7 @@ tests:
       registry: cgr.dev
       repository: chainguard/bash
       pullPolicy: IfNotPresent
-      tag: latest@sha256:eefb26b2a87b897e4dad65909dad8a7896fe3ed97aa76ac874fa3594011256ea
+      tag: latest@sha256:e86de1df7a1fd81185ec64e0c154626ed87537ac390271a3a10f0a54cea9a7b0
 
   toolkit:
     ## @param tests.toolkit.image.registry The OCI registry to pull the image from
@@ -358,7 +366,7 @@ tests:
       registry: cgr.dev
       repository: chainguard/min-toolkit-debug
       pullPolicy: IfNotPresent
-      tag: latest@sha256:3dd03ca4056a6c8024ed1e5dc0999aa836c0c28777dcc3b85bd1d9d853e1ed38
+      tag: latest@sha256:171460fe39c543746a955c93bc1f57f195e4f2ab52d38942aa1b064399a1fecc
 
   step:
     ## @param tests.step.image.registry The OCI registry to pull the image from
@@ -370,7 +378,7 @@ tests:
       registry: "docker.io"
       repository: smallstep/step-cli
       pullPolicy: IfNotPresent
-      tag: 0.28.6
+      tag: 0.28.7
 
   busybox:
     ## @param tests.busybox.image.registry The OCI registry to pull the image from
@@ -404,7 +412,7 @@ tools:
     ## @param tools.kubectl.image.tag Overrides the image tag whose default is the chart appVersion
     ##
     image:
-      registry: docker.io
-      repository: rancher/kubectl
+      registry: registry.k8s.io
+      repository: kubectl
       pullPolicy: IfNotPresent
       tag: ""
