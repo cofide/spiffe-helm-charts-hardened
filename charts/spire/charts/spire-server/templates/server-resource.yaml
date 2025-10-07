@@ -79,8 +79,16 @@ metadata:
     app.kubernetes.io/component: server
 spec:
   {{- if not .Values.autoscaling.enabled }}
+  {{- if eq .Values.dataStore.plugin "connect" }}
+  {{- if and (not (include "has-any-upstreamauthority" .)) (gt (int .Values.replicaCount) 1) }}
+  {{- fail "When running with connect data store, an upstream authority must be enabled to scale beyond one instance." }}
+  {{- end }}
+  {{- else if eq .Values.dataStore.plugin "sql" }}
   {{- if and (eq .Values.dataStore.sql.databaseType "sqlite3") (gt (int .Values.replicaCount) 1) }}
   {{- fail "When running with sqlite3 database, you can't scale up to more then one instance. 'replicaCount' MUST be 1" }}
+  {{- end }}
+  {{- else }}
+  {{- fail "Unsupported dataStore.plugin. Supported plugins are [\"connect\", \"sql\"]" }}
   {{- end }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
