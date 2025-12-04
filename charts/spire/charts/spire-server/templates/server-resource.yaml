@@ -650,7 +650,7 @@ spec:
             - serviceAccountToken:
                 path: connect-token
                 expirationSeconds: {{ .Values.dataStore.connect.auth.psatExpirationSeconds | int }}
-                audience: {{ .Values.dataStore.connect.url }}
+                audience: {{ .Values.dataStore.connect.auth.psatAudience | default .Values.dataStore.connect.url }}
         {{- end -}}
   {{- if eq .Values.persistence.type "pvc" }}
   volumeClaimTemplates:
