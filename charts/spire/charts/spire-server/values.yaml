@@ -223,6 +223,18 @@ dataStore:
         name: ""
         ## @param dataStore.sql.readOnly.externalSecret.key The key of the secret object whose value is the dataStore.sql password
         key: ""
+  connect:
+    ## @param dataStore.connect.url The URL of Cofide Connect API.
+    url: ""
+    auth:
+      ## @param dataStore.connect.auth.method The authentication method to use. Valid options are "psat" (recommended, uses k8s OIDC) and "join_token".
+      method: psat
+      ## @param dataStore.connect.auth.psatExpirationSeconds The expiration time in seconds for the PSAT when auth.method is "psat".
+      psatExpirationSeconds: 900
+      ## @param dataStore.connect.auth.psatAudience Override the audience to use for the PSAT when auth.method is "psat". The default is the connect.url.
+      psatAudience: ""
+      ## @param dataStore.connect.auth.joinToken The join token to use when auth.method is "join_token".
+      joinToken: ""
 
 ## @param adminIDs SPIFFE IDs that, when present in a caller’s X509-SVID, grant that caller admin privileges.
 adminIDs: []
