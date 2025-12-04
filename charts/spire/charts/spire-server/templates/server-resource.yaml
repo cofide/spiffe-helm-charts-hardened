@@ -64,6 +64,23 @@
 {{-     fail "clientKeyPath can only be set with database type mysql or aws_mysql." }}
 {{-   end }}
 {{- end }}
+{{- if eq .Values.dataStore.plugin "connect" }}
+{{-   if not .Values.dataStore.connect.url }}
+{{-     fail "dataStore.connect.url must be set when using connect data store." }}
+{{-   end }}
+{{-   $authMethod := .Values.dataStore.connect.auth.method }}
+{{-   if eq $authMethod "join_token" }}
+{{-     if not .Values.dataStore.connect.auth.joinToken }}
+{{-       fail "dataStore.connect.auth.joinToken must be set when using join_token authentication method." }}
+{{-     end }}
+{{-   else if eq $authMethod "psat" }}
+{{-     if .Values.dataStore.connect.auth.joinToken }}
+{{-       fail "dataStore.connect.auth.joinToken must NOT be set when using psat authentication method." }}
+{{-     end }}
+{{-   else }}
+{{-     fail (printf "Unsupported dataStore.connect.auth.method %q. Supported methods are [\"psat\", \"join_token\"]" $authMethod) }}
+{{-   end }}
+{{- end }}
 {{- if not .Values.externalServer }}
 apiVersion: apps/v1
 {{- if eq .Values.kind "statefulset" }}
@@ -299,6 +316,15 @@ spec:
                 name: {{ $fullname }}-cloud
                 key: GOOGLE_APPLICATION_CREDENTIALS
           {{- end }}
+          {{- if eq .Values.dataStore.plugin "connect" }}
+          {{- if eq (.Values.dataStore.connect.auth.method) "join_token" }}
+          - name: CONNECT_JOIN_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ $fullname }}-connect-join-token
+                key: CONNECT_JOIN_TOKEN
+          {{- end }}
+          {{- end }}
           ports:
             - name: grpc
               containerPort: 8081
@@ -401,6 +427,12 @@ spec:
             - name: server-tmp
               mountPath: /tmp
               readOnly: false
+            {{- if and (eq .Values.dataStore.plugin "connect") (eq .Values.dataStore.connect.auth.method "psat") }}
+            - name: connect-token
+              mountPath: /var/run/secrets/tokens/connect-token
+              subPath: connect-token
+              readOnly: true
+            {{- end -}}
         {{- include "spire-controller-manager.containers" . | nindent 8 }}
         {{- if eq (.Values.tornjak.enabled | toString) "true" }}
         - name: tornjak
@@ -610,6 +642,15 @@ spec:
                 {{- end }}
         {{- end }}
         {{- end -}}
+        {{- end -}}
+        {{- if and (eq .Values.dataStore.plugin "connect") (eq .Values.dataStore.connect.auth.method "psat") }}
+        - name: connect-token
+          projected:
+            sources:
+            - serviceAccountToken:
+                path: connect-token
+                expirationSeconds: {{ .Values.dataStore.connect.auth.psatExpirationSeconds | int }}
+                audience: {{ .Values.dataStore.connect.url }}
         {{- end -}}
   {{- if eq .Values.persistence.type "pvc" }}
   volumeClaimTemplates:

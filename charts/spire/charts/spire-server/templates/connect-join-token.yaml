@@ -1,0 +1,10 @@
+{{- $root := . }}
+{{- if and (eq .Values.dataStore.plugin "connect") (eq .Values.dataStore.connect.auth.method "join_token") }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "spire-server.fullname" $root }}-connect-join-token
+  namespace: {{ include "spire-server.namespace" $root }}
+data:
+  CONNECT_JOIN_TOKEN: {{ .Values.dataStore.connect.auth.joinToken | b64enc }}
+{{- end }}
