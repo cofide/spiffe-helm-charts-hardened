@@ -433,6 +433,12 @@ spec:
               subPath: connect-token
               readOnly: true
             {{- end -}}
+            {{- if .Values.extraCAs }}
+            - name: extra-ca
+              mountPath: /etc/ssl/certs/extra-ca.crt
+              subPath: ca.crt
+              readOnly: true
+            {{- end -}}
         {{- include "spire-controller-manager.containers" . | nindent 8 }}
         {{- if eq (.Values.tornjak.enabled | toString) "true" }}
         - name: tornjak
@@ -651,6 +657,11 @@ spec:
                 path: connect-token
                 expirationSeconds: {{ .Values.dataStore.connect.auth.psatExpirationSeconds | int }}
                 audience: {{ .Values.dataStore.connect.auth.psatAudience | default .Values.dataStore.connect.url }}
+        {{- end -}}
+        {{- if .Values.extraCAs }}
+        - name: extra-ca
+          configMap:
+            name: {{ include "spire-server.fullname" . }}-extra-ca
         {{- end -}}
   {{- if eq .Values.persistence.type "pvc" }}
   volumeClaimTemplates:

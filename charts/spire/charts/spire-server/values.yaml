@@ -914,6 +914,9 @@ extraVolumeMounts: []
 ## @param extraContainers [array] Additional containers to create
 extraContainers: []
 
+## @param extraCAs [string] A bundle, in PEM format, of X.509 certificates representing additional Certificate Authorities (CAs) to add to the default (WebPKI) trust store
+extraCAs: ""
+
 ## @param initContainers [array] Additional init containers to create
 initContainers: []
 
