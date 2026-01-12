@@ -146,7 +146,8 @@ spec:
       securityContext:
         {{- $podSecurityContext | toYaml | nindent 8 }}
       {{- include "spire-lib.default_cluster_priority_class_name" . | nindent 6 }}
-      {{- if or (gt (len .Values.initContainers) 0) (and .Values.upstreamAuthority.certManager.enabled .Values.upstreamAuthority.certManager.ca.create) .Values.nodeAttestor.tpmDirect.enabled .Values.credentialComposer.cel.enabled $needsChown }}
+      {{- /* COFIDE: an init container for the tpmDirect plugin is only required when not using the builtin plugin. */}}
+      {{- if or (gt (len .Values.initContainers) 0) (and .Values.upstreamAuthority.certManager.enabled .Values.upstreamAuthority.certManager.ca.create) (and .Values.nodeAttestor.tpmDirect.enabled (ne (.Values.nodeAttestor.tpmDirect.builtin | toString) "true")) .Values.credentialComposer.cel.enabled $needsChown }}
       initContainers:
         {{- if .Values.credentialComposer.cel.enabled }}
         - name: init-cel
@@ -181,7 +182,8 @@ spec:
               mountPath: /cel
           imagePullPolicy: {{ .Values.credentialComposer.cel.image.pullPolicy }}
         {{- end }}
-        {{- if .Values.nodeAttestor.tpmDirect.enabled }}
+        {{- /* COFIDE: an init container for the tpmDirect plugin is only required when not using the builtin plugin. */}}
+        {{- if and .Values.nodeAttestor.tpmDirect.enabled (ne (.Values.nodeAttestor.tpmDirect.builtin | toString) "true") }}
         - name: init-tpm-direct
           securityContext:
             {{- include "spire-lib.securitycontext" . | nindent 12 }}
@@ -375,9 +377,12 @@ spec:
               readOnly: true
             {{- end }}
             {{- if .Values.nodeAttestor.tpmDirect.enabled }}
+              {{- /* COFIDE: this volume is only required by the init container */}}
+              {{- if ne (.Values.nodeAttestor.tpmDirect.builtin | toString) "true" }}
             - name: tpm-direct
               mountPath: /tpm
               readOnly: true
+              {{- end }}
             {{- if ne (len .Values.nodeAttestor.tpmDirect.cas) 0 }}
             - name: tpm-direct-cas
               mountPath: /tpm-direct-cas
@@ -529,8 +534,11 @@ spec:
           emptyDir: {}
         {{- end }}
         {{- if .Values.nodeAttestor.tpmDirect.enabled }}
+        {{- /* COFIDE: this volume is only required when using an init container */}}
+        {{- if ne (.Values.nodeAttestor.tpmDirect.builtin | toString) "true" }}
         - name: tpm-direct
           emptyDir: {}
+        {{- end }}
         {{- if ne (len .Values.nodeAttestor.tpmDirect.cas) 0 }}
         - name: tpm-direct-cas
           configMap:
