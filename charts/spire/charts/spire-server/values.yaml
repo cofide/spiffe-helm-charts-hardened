@@ -976,6 +976,8 @@ nodeAttestor:
   tpmDirect:
     ## @param nodeAttestor.tpmDirect.enabled Enable the direct TPM node attestor, a 3rd party plugin by Boxboat. This plugin is experimental.
     enabled: false
+    ## @param nodeAttestor.tpmDirect.builtin Whether to use a built-in plugin rather than an external one. Requires Cofide SPIRE.
+    builtin: true
     ## @param nodeAttestor.tpmDirect.image.registry The OCI registry to pull the image from
     ## @param nodeAttestor.tpmDirect.image.repository The repository within the registry
     ## @param nodeAttestor.tpmDirect.image.pullPolicy The image pull policy

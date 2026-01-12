@@ -205,8 +205,10 @@ plugins:
   {{- with .Values.nodeAttestor.tpmDirect }}
   {{- if eq (.enabled | toString) "true" }}
     tpm:
+      {{- if ne (.builtin | toString) "true" }}
       plugin_cmd: "/tpm/tpm_attestor_server"
       plugin_checksum: {{ .checksum }}
+      {{- end }}
       plugin_data:
         {{- if ne (len .cas) 0 }}
         ca_path: /tpm-direct-cas
