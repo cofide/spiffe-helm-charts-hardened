@@ -68,6 +68,15 @@
 {{-   if not .Values.dataStore.connect.url }}
 {{-     fail "dataStore.connect.url must be set when using connect data store." }}
 {{-   end }}
+{{-   if not .Values.dataStore.connect.trustDomain }}
+{{-     fail "dataStore.connect.trustDomain must be set when using connect data store." }}
+{{-   end }}
+{{-   if not .Values.dataStore.connect.bundleEndpointURL }}
+{{-     fail "dataStore.connect.bundleEndpointURL must be set when using connect data store." }}
+{{-   end }}
+{{-   if not .Values.dataStore.connect.trustZoneServerID }}
+{{-     fail "dataStore.connect.trustZoneServerID must be set when using connect data store." }}
+{{-   end }}
 {{-   $authMethod := .Values.dataStore.connect.auth.method }}
 {{-   if eq $authMethod "join_token" }}
 {{-     if not .Values.dataStore.connect.auth.joinToken }}
@@ -319,6 +328,16 @@ spec:
                 key: GOOGLE_APPLICATION_CREDENTIALS
           {{- end }}
           {{- if eq .Values.dataStore.plugin "connect" }}
+          - name: DATASTORE
+            value: connect
+          - name: COFIDE_CONNECT_URL
+            value: {{ .Values.dataStore.connect.url | quote }}
+          - name: COFIDE_CONNECT_TRUST_DOMAIN
+            value: {{ .Values.dataStore.connect.trustDomain | quote }}
+          - name: COFIDE_CONNECT_BUNDLE_ENDPOINT_URL
+            value: {{ .Values.dataStore.connect.bundleEndpointURL | quote }}
+          - name: TRUST_ZONE_SERVER_ID
+            value: {{ .Values.dataStore.connect.trustZoneServerID | quote }}
           {{- if eq (.Values.dataStore.connect.auth.method) "join_token" }}
           - name: CONNECT_JOIN_TOKEN
             valueFrom:

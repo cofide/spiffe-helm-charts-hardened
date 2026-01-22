@@ -226,6 +226,12 @@ dataStore:
   connect:
     ## @param dataStore.connect.url The URL of Cofide Connect API.
     url: ""
+    ## @param dataStore.connect.trustDomain The trust domain of Cofide Connect API.
+    trustDomain: ""
+    ## @param dataStore.connect.bundleEndpointURL The URL to fetch the trust bundle for Cofide Connect API from. Must be trusted HTTPS for security.
+    bundleEndpointURL: ""
+    ## @param dataStore.connect.trustZoneServerID The Trust Zone Server ID to use when connecting to Cofide Connect API.
+    trustZoneServerID: ""
     auth:
       ## @param dataStore.connect.auth.method The authentication method to use. Valid options are "psat" (recommended, uses k8s OIDC) and "join_token".
       method: psat
