@@ -74,8 +74,11 @@
 {{-   if not .Values.dataStore.connect.bundleEndpointURL }}
 {{-     fail "dataStore.connect.bundleEndpointURL must be set when using connect data store." }}
 {{-   end }}
-{{-   if not .Values.dataStore.connect.trustZoneServerID }}
-{{-     fail "dataStore.connect.trustZoneServerID must be set when using connect data store." }}
+{{-   if and (not .Values.dataStore.connect.trustZoneServerID) (not .Values.dataStore.connect.clusterID) }}
+{{-     fail "dataStore.connect.trustZoneServerID or dataStore.connect.clusterID must be set when using connect data store." }}
+{{-   end }}
+{{-   if not .Values.dataStore.connect.trustZoneID }}
+{{-     fail "dataStore.connect.trustZoneID must be set when using connect data store." }}
 {{-   end }}
 {{-   $authMethod := .Values.dataStore.connect.auth.method }}
 {{-   if eq $authMethod "join_token" }}
@@ -336,8 +339,16 @@ spec:
             value: {{ .Values.dataStore.connect.trustDomain | quote }}
           - name: COFIDE_CONNECT_BUNDLE_ENDPOINT_URL
             value: {{ .Values.dataStore.connect.bundleEndpointURL | quote }}
+          {{- if .Values.dataStore.connect.trustZoneServerID }}
           - name: TRUST_ZONE_SERVER_ID
             value: {{ .Values.dataStore.connect.trustZoneServerID | quote }}
+          {{- end }}
+          {{- if .Values.dataStore.connect.clusterID }}
+          - name: CLUSTER_ID
+            value: {{ .Values.dataStore.connect.clusterID | quote }}
+          {{- end }}
+          - name: TRUST_ZONE_ID
+            value: {{ .Values.dataStore.connect.trustZoneID | quote }}
           {{- if eq (.Values.dataStore.connect.auth.method) "join_token" }}
           - name: CONNECT_JOIN_TOKEN
             valueFrom:
