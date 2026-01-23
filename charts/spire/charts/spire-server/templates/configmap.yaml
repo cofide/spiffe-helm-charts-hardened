@@ -1,4 +1,6 @@
+{{- if or (eq (.Values.nodeAttestor.k8sPSAT.enabled | toString) "true") (eq (.Values.controllerManager.enabled | toString) "true") }}
 {{- include "spire-lib.check-strict-mode" (list . "clusterName must be set" (eq (include "spire-lib.cluster-name" .) "example-cluster"))}}
+{{- end }}
 {{- include "spire-lib.check-strict-mode" (list . "trustDomain must be set" (eq (include "spire-lib.trust-domain" .) "example.org"))}}
 {{- include "spire-lib.check-strict-mode" (list . "jwtIssuer must be set" (eq (include "spire-lib.jwt-issuer" .) "https://oidc-discovery.example.org"))}}
 {{- include "spire-lib.check-strict-mode" (list . "caSubject.country must be set" (eq (include "spire-server.ca-subject-country" .) "ARPA"))}}

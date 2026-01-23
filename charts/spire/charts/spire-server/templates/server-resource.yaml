@@ -349,6 +349,8 @@ spec:
           {{- end }}
           - name: TRUST_ZONE_ID
             value: {{ .Values.dataStore.connect.trustZoneID | quote }}
+          - name: TRUST_DOMAIN
+            value: {{ include "spire-lib.trust-domain" . | quote }}
           {{- if eq (.Values.dataStore.connect.auth.method) "join_token" }}
           - name: CONNECT_JOIN_TOKEN
             valueFrom:
