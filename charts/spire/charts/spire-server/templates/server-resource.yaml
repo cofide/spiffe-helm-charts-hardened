@@ -333,6 +333,8 @@ spec:
           {{- if eq .Values.dataStore.plugin "connect" }}
           - name: DATASTORE
             value: connect
+          - name: NAMESPACE
+            value: {{ include "spire-server.namespace" . }}
           - name: COFIDE_CONNECT_URL
             value: {{ .Values.dataStore.connect.url | quote }}
           - name: COFIDE_CONNECT_TRUST_DOMAIN
