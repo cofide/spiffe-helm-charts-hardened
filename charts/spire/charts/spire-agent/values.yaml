@@ -315,6 +315,9 @@ extraVolumeMounts: []
 ## @param extraContainers [array] Additional containers to create with Spire Agent pods
 extraContainers: []
 
+## @param extraCAs [string] A bundle, in PEM format, of X.509 certificates representing additional Certificate Authorities (CAs) to add to the default (WebPKI) trust store
+extraCAs: ""
+
 ## @param initContainers [array] Additional init containers to create with Spire Agent pods
 initContainers: []
 ## @param hostAliases [array] Customize /etc/hosts file as described here https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/

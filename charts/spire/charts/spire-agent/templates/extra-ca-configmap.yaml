@@ -1,0 +1,12 @@
+{{- if .Values.extraCAs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "spire-agent.fullname" . }}-extra-ca
+  namespace: {{ include "spire-agent.namespace" . }}
+  labels:
+    {{- include "spire-agent.labels" . | nindent 4 }}
+data:
+  ca.crt: |
+{{ .Values.extraCAs | indent 4 }}
+{{- end }}
