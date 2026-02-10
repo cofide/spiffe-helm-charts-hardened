@@ -290,6 +290,12 @@ spec:
               mountPath: /hostCert
               readOnly: true
             {{- end }}
+            {{- if .Values.extraCAs }}
+            - name: extra-ca
+              mountPath: /etc/ssl/certs/extra-ca.crt
+              subPath: ca.crt
+              readOnly: true
+            {{- end -}}
             {{- if gt (len .Values.extraVolumeMounts) 0 }}
             {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
@@ -392,6 +398,11 @@ spec:
           hostPath:
             path: {{ .Values.workloadAttestors.k8s.verification.hostCert.basePath | quote }}
         {{- end }}
+        {{- if .Values.extraCAs }}
+        - name: extra-ca
+          configMap:
+            name: {{ include "spire-agent.fullname" . }}-extra-ca
+        {{- end -}}
         {{- if gt (len .Values.extraVolumes) 0 }}
         {{- toYaml .Values.extraVolumes | nindent 8 }}
         {{- end }}
