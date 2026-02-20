@@ -142,11 +142,21 @@ plugins:
         {{- end }}
         disable_migration: {{ .Values.dataStore.sql.disableMigration }}
 
-  {{- if or .Values.nodeAttestor.k8sPSAT.enabled .Values.nodeAttestor.externalK8sPSAT.enabled .Values.nodeAttestor.joinToken.enabled .Values.nodeAttestor.httpChallenge.enabled .Values.nodeAttestor.tpmDirect.enabled }}
+  {{- if or .Values.nodeAttestor.k8sPSAT.enabled .Values.nodeAttestor.externalK8sPSAT.enabled .Values.nodeAttestor.connectK8sPSAT.enabled .Values.nodeAttestor.joinToken.enabled .Values.nodeAttestor.httpChallenge.enabled .Values.nodeAttestor.tpmDirect.enabled }}
   NodeAttestor:
   {{- $clusters := default .Values.kubeConfigs .Values.nodeAttestor.externalK8sPSAT.clusters }}
-  {{- if or (eq (.Values.nodeAttestor.k8sPSAT.enabled | toString) "true") (and (eq (.Values.nodeAttestor.externalK8sPSAT.enabled | toString) "true") (gt (len $clusters) 0)) }}
+  {{- $k8sPSATEnabled := .Values.nodeAttestor.k8sPSAT.enabled -}}
+  {{- $externalK8sPSATEnabled := .Values.nodeAttestor.externalK8sPSAT.enabled -}}
+  {{- $connectK8sPSATEnabled := .Values.nodeAttestor.connectK8sPSAT.enabled -}}
+  {{- if and $connectK8sPSATEnabled (or $k8sPSATEnabled $externalK8sPSATEnabled) }}
+    {{- fail "nodeAttestor.connectK8sPSAT cannot be enabled at the same time as nodeAttestor.k8sPSAT or nodeAttestor.externalK8sPSAT" -}}
+  {{- end -}}
+  {{- if or $connectK8sPSATEnabled $k8sPSATEnabled (and $externalK8sPSATEnabled (gt (len $clusters) 0) ) }}
     k8s_psat:
+      {{- if eq (.Values.nodeAttestor.connectK8sPSAT.enabled | toString) "true" }}
+      plugin_data_cofide_connect: true
+      plugin_data_cofide_connect_poll_interval: {{ .Values.nodeAttestor.connectK8sPSAT.pollInterval }}
+      {{- else }}
       plugin_data:
         clusters:
           {{- with .Values.nodeAttestor.k8sPSAT }}
@@ -182,6 +192,7 @@ plugins:
               {{ if hasKey $clusterSettings "allowedPodLabelKeys" }}{{ toYaml $clusterSettings.allowedPodLabelKeys | nindent 14 }}{{ else }}{{ toYaml $clusterDefaults.allowedPodLabelKeys | nindent 14 }}{{ end }}
           {{- end }}
           {{- end }}
+      {{- end }}
   {{- end }}
   {{- with .Values.nodeAttestor.joinToken }}
   {{- if eq (.enabled | toString) "true" }}

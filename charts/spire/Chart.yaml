@@ -3,7 +3,7 @@ name: spire
 description: >
   A Helm chart for deploying the complete Cofide SPIRE stack including: spire-server, spire-agent, spiffe-csi-driver, and spiffe-oidc-discovery-provider.
 type: application
-version: 0.26.0-cofide.11
+version: 0.26.0-cofide.12
 appVersion: "1.12.4"
 keywords: ["spiffe", "spire", "spire-server", "spire-agent", "oidc"]
 home: https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
