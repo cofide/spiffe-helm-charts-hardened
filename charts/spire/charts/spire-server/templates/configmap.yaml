@@ -153,7 +153,7 @@ plugins:
   {{- end -}}
   {{- if or $connectK8sPSATEnabled $k8sPSATEnabled (and $externalK8sPSATEnabled (gt (len $clusters) 0) ) }}
     k8s_psat:
-      {{- if eq (.Values.nodeAttestor.connectK8sPSAT.enabled | toString) "true" }}
+      {{- if $connectK8sPSATEnabled }}
       plugin_data_cofide_connect: true
       plugin_data_cofide_connect_poll_interval: {{ .Values.nodeAttestor.connectK8sPSAT.pollInterval }}
       {{- else }}
