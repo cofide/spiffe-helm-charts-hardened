@@ -969,6 +969,11 @@ nodeAttestor:
     #   kubeConfigName: foo
     #   serviceAccountAllowList: ["other-ns:other-agent"]
     # clusterb: {}
+  connectK8sPSAT:
+    ## @param nodeAttestor.connectK8sPSAT.enabled Enable PSAT k8s nodeattestor with Connect datasource. Cannot be enabled simultaneously with the k8sPSAT or externalK8sPSAT node attestors.
+    enabled: false
+    ## @param nodeAttestor.connectK8sPSAT.pollInterval Frequency with which to poll Connect to build plugin config.
+    pollInterval: 10s
   joinToken:
     ## @param nodeAttestor.joinToken.enabled Enable the join_token nodeattestor
     enabled: false
