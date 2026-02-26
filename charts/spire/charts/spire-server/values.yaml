@@ -1193,6 +1193,9 @@ secrets:
     ## @param secrets.gcp.applicationCredentials Google Application Credentials
     applicationCredentials: ""
 
+## @param disableClusterRoles Set this to true to disable the creation of the ClusterRole that gives SPIRE server the required access for node attestation in the cluster it runs in.
+disableClusterRoles: false
+
 # NOTE: This is unsupported and only to configure currently supported spire built in plugins but plugins unsupported by the chart.
 # Upgrades wont be tested for anything under this config. If you need this, please let the chart developers know your needs so we
 # can prioritize proper support.
