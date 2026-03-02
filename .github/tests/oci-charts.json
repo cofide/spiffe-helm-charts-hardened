@@ -1,17 +1,17 @@
 [
   {
-    "name": "mysql",
-    "registry": "docker.io/bitnamicharts/mysql",
-    "version": "13.0.2"
+    "name": "mariadb",
+    "registry": "docker.io/bitnamicharts/mariadb",
+    "version": "24.0.3"
   },
   {
     "name": "postgresql",
     "registry": "docker.io/bitnamicharts/postgresql",
-    "version": "16.7.9"
+    "version": "18.2.3"
   },
   {
     "name": "envoy-gateway",
     "registry": "docker.io/envoyproxy/gateway-helm",
-    "version": "v1.4.1"
+    "version": "v1.6.2"
   }
 ]

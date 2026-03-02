@@ -61,8 +61,18 @@ server:
   ca_key_type: {{ .Values.caKeyType | quote }}
   ca_ttl: {{ .Values.caTTL | quote }}
 
+  {{- if .Values.agentTTL }}
+  agent_ttl: {{ .Values.agentTTL | quote }}
+  {{- end }}
   default_x509_svid_ttl: {{ .Values.defaultX509SvidTTL | quote }}
   default_jwt_svid_ttl: {{ .Values.defaultJwtSvidTTL | quote }}
+
+  {{- if .Values.pruneAttestedNodesExpiredFor }}
+  prune_attested_nodes_expired_for: {{ .Values.pruneAttestedNodesExpiredFor | quote }}
+  {{- end }}
+  {{- if .Values.pruneTOFUNodes }}
+  prune_tofu_nodes: {{ .Values.pruneTOFUNodes }}
+  {{- end }}
 
   ca_subject:
     - country: [{{ include "spire-server.ca-subject-country" . | quote }}]
@@ -100,6 +110,12 @@ server:
       {{- range .featureFlags }}
         - {{ . | quote }}
       {{- end }}
+    {{- end }}
+    {{- if (and .authOpaPolicyEngine.local.policy_data .authOpaPolicyEngine.local.rego) }}
+    auth_opa_policy_engine:
+      local:
+        policy_data_path: /run/spire/config/policy_data.json
+        rego_path: /run/spire/config/policy.rego
     {{- end }}
   {{- end }}
   {{- end }}
@@ -142,7 +158,7 @@ plugins:
         {{- end }}
         disable_migration: {{ .Values.dataStore.sql.disableMigration }}
 
-  {{- if or .Values.nodeAttestor.k8sPSAT.enabled .Values.nodeAttestor.externalK8sPSAT.enabled .Values.nodeAttestor.connectK8sPSAT.enabled .Values.nodeAttestor.joinToken.enabled .Values.nodeAttestor.httpChallenge.enabled .Values.nodeAttestor.tpmDirect.enabled }}
+  {{- if or .Values.nodeAttestor.k8sPSAT.enabled .Values.nodeAttestor.externalK8sPSAT.enabled .Values.nodeAttestor.connectK8sPSAT.enabled .Values.nodeAttestor.joinToken.enabled .Values.nodeAttestor.httpChallenge.enabled .Values.nodeAttestor.tpmDirect.enabled .Values.nodeAttestor.awsIID.enabled }}
   NodeAttestor:
   {{- $clusters := default .Values.kubeConfigs .Values.nodeAttestor.externalK8sPSAT.clusters }}
   {{- $k8sPSATEnabled := .Values.nodeAttestor.k8sPSAT.enabled -}}
@@ -231,6 +247,15 @@ plugins:
         {{- end }}
   {{- end }}
   {{- end }}
+  {{- with .Values.nodeAttestor.awsIID }}
+  {{- if eq (.enabled | toString) "true" }}
+    aws_iid:
+      plugin_data:
+        {{- if ne .assumeRole "" }}
+        assume_role: {{ .assumeRole | quote }}
+        {{- end }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 
   {{- with .Values.keyManager.disk }}
@@ -272,6 +297,12 @@ plugins:
         {{- end }}
         {{- if or (ne .keyPolicy.policy "") (ne .keyPolicy.existingConfigMap "") }}
         key_policy_file: "/run/spire/data/aws-kms-key-policy.json"
+        {{- end }}
+        {{- with .keyTags }}
+        key_tags:
+          {{- range $key, $value := . }}
+          {{ $key }}: {{ $value | quote }}
+          {{- end }}
         {{- end }}
   {{- end }}
   {{- end }}
@@ -499,6 +530,13 @@ telemetry:
       - host: "0.0.0.0"
         port: 9988
 {{- end }}
+
+{{- if .Values.telemetry.datadog.enabled }}
+telemetry:
+  - DogStatsd:
+      - address: "{{ .Values.telemetry.datadog.address }}:{{ .Values.telemetry.datadog.port }}"
+{{- end }}
+
 {{- end }}
 {{- if not .Values.externalServer }}
 apiVersion: v1
@@ -513,4 +551,10 @@ metadata:
 data:
   server.conf: |
     {{- include "spire-lib.reformat-and-yaml2json" (dict "config" (include "spire-server.yaml-config" .) "root" .) | nindent 4 }}
+  {{- if (and .Values.experimental.enabled .Values.experimental.authOpaPolicyEngine.local.policy_data .Values.experimental.authOpaPolicyEngine.local.rego) }}
+  policy_data.json: |
+    {{- .Values.experimental.authOpaPolicyEngine.local.policy_data | toString | nindent 4 }}
+  policy.rego: |
+    {{- .Values.experimental.authOpaPolicyEngine.local.rego | toString | nindent 4 }}
+  {{- end }}
 {{- end }}

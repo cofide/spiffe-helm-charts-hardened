@@ -19,8 +19,21 @@
 {{-     end }}
 {{-   end }}
 {{- end }}
+{{- if and .Values.keyManager.disk.enabled (ne .Values.persistence.type "hostPath") }}
+{{-   fail "keyManager.disk.enabled is true but persistence.type is not hostPath. Ensure persistence.type is hostPath when keyManager.disk.enabled is true." }}
+{{- end }}
 {{- if hasPrefix (.Values.socketPath | dir | clean) (.Values.sockets.hostBasePath | clean) }}
-{{- fail "The sockets.hostBasePath can not be located under the socketPath direcotry" }}
+{{- fail "The sockets.hostBasePath can not be located under the socketPath directory" }}
+{{- end }}
+{{- /* Validate kubeletAddress.mode */ -}}
+{{- if and (hasKey .Values "kubeletAddress") (ne .Values.kubeletAddress.mode "") }}
+{{-   if not (has .Values.kubeletAddress.mode (list "auto" "localhost" "hostname" "hostip" "custom")) }}
+{{-     fail (printf "kubeletAddress.mode must be one of [auto, localhost, hostname, hostip, custom], got: %s" .Values.kubeletAddress.mode) }}
+{{-   end }}
+{{- end }}
+{{- /* Prevent using both old and new config */ -}}
+{{- if and (ne (.Values.kubeletConnectByHostname | toString) "") (and (hasKey .Values "kubeletAddress") (ne .Values.kubeletAddress.mode "") (ne .Values.kubeletAddress.mode "auto")) }}
+{{-   fail "Both kubeletConnectByHostname (deprecated) and kubeletAddress.mode are set. Please use only kubeletAddress.mode." }}
 {{- end }}
 {{- end }}
 {{- define "spire-agent.yaml-config" -}}
@@ -34,7 +47,9 @@ agent:
   {{- end }}
   data_dir: "/var/lib/spire"
   log_level: {{ .Values.logLevel | quote }}
-  retry_bootstrap: true
+  log_format: {{ .Values.logFormat | quote }}
+  rebootstrap_mode: {{ .Values.rebootstrapMode | quote }}
+  rebootstrap_delay: {{ .Values.rebootstrapDelay | quote }}
   server_address: {{ include "spire-agent.server-address" . | trim | quote }}
   server_port: {{ .Values.server.port | quote }}
   socket_path: /tmp/spire-agent/public/{{ include "spire-agent.socket-path" . | base }}
@@ -104,6 +119,13 @@ plugins:
     {{- $nodeAttestorUsed = add1 $nodeAttestorUsed }}
     {{- end }}
     {{- end }}
+  {{- with .Values.nodeAttestor.awsIID }}
+  {{- if eq (.enabled | toString) "true" }}
+    aws_iid:
+      plugin_data: {}
+    {{- $nodeAttestorUsed = add1 $nodeAttestorUsed }}
+    {{- end }}
+    {{- end }}
 {{- if ne $nodeAttestorUsed 1 }}
 {{- fail (printf "You have to enable exactly one Node Attestor. There are %d enabled." $nodeAttestorUsed) }}
 {{- end }}
@@ -112,6 +134,12 @@ plugins:
     {{- if .Values.keyManager.memory.enabled }}
     memory:
       plugin_data:
+    {{- $keyManagerUsed = add1 $keyManagerUsed }}
+    {{- end }}
+    {{- if .Values.keyManager.disk.enabled }}
+    disk:
+      plugin_data:
+        directory: {{ .Values.persistence.hostPath }}
     {{- $keyManagerUsed = add1 $keyManagerUsed }}
     {{- end }}
 {{- if ne $keyManagerUsed 1 }}
@@ -131,8 +159,8 @@ plugins:
         disable_container_selectors: {{ eq .Values.workloadAttestors.k8s.disableContainerSelectors true}}
         use_new_container_locator: {{ eq .Values.workloadAttestors.k8s.useNewContainerLocator true }}
         verbose_container_locator_logs: {{ eq .Values.workloadAttestors.k8s.verboseContainerLocatorLogs true }}
-        {{- if eq (include "spire-agent.connect-by-hostname" .) "true" }}
-        node_name_env: "MY_NODE_NAME"
+        {{- if eq (include "spire-agent.should-set-node-name-env" .) "true" }}
+        node_name_env: "KUBELET_ADDR"
         {{- end }}
   {{- end }}
 
@@ -151,9 +179,16 @@ health_checks:
 {{- if or (dig "telemetry" "prometheus" "enabled" .Values.telemetry.prometheus.enabled .Values.global) (and (dig "spire" "recommendations" "enabled" false .Values.global) (dig "spire" "recommendations" "prometheus" true .Values.global)) }}
 telemetry:
   - Prometheus:
-      - host: "0.0.0.0"
+      - host: {{ .Values.telemetry.prometheus.host }}
         port: {{ .Values.telemetry.prometheus.port }}
 {{- end }}
+
+{{- if .Values.telemetry.datadog.enabled }}
+telemetry:
+  - DogStatsd:
+      - address: "{{ .Values.telemetry.datadog.address }}:{{ .Values.telemetry.datadog.port }}"
+{{- end }}
+
 {{- end }}
 {{- $root := . }}
 {{- range $name := (concat (list "default") (keys .Values.agents)) | uniq }}
