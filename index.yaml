@@ -3,6 +3,36 @@ entries:
   spiffe-step-ssh:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-03-02T13:52:33.276370279Z"
+    dependencies:
+    - name: spire-lib
+      repository: file://../spire/charts/spire-lib
+      version: 0.1.0
+    - alias: step
+      name: step-certificates
+      repository: https://smallstep.github.io/helm-charts/
+      version: 1.27.4
+    description: sshd signed host certificates using SPIFFE for trust and step CA
+    digest: bc98721d302e454665498b0a5e84861655ed57b77121f373d66bb678b1dd4882
+    home: https://github.com/spiffe/helm-charts-hardened/tree/main/charts/spiffe-step-ssh
+    icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
+    keywords:
+    - spiffe
+    - step
+    - step-ca
+    - ssh
+    maintainers:
+    - email: Kevin.Fox@pnnl.gov
+      name: kfox1111
+    name: spiffe-step-ssh
+    sources:
+    - https://github.com/spiffe/helm-charts-hardened/tree/main/charts/spiffe-step-ssh
+    type: application
+    urls:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spiffe-step-ssh-0.1.1/spiffe-step-ssh-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-08-08T07:59:08.05482344Z"
     dependencies:
     - name: spire-lib
@@ -32,6 +62,55 @@ entries:
     - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spiffe-step-ssh-0.1.0/spiffe-step-ssh-0.1.0.tgz
     version: 0.1.0
   spire:
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: 1.13.2
+    created: "2026-03-02T13:52:33.451828563Z"
+    dependencies:
+    - name: spire-lib
+      repository: file://./charts/spire-lib
+      version: 0.1.0
+    - condition: spire-server.enabled
+      name: spire-server
+      repository: file://./charts/spire-server
+      version: 0.1.0
+    - condition: spire-agent.enabled
+      name: spire-agent
+      repository: file://./charts/spire-agent
+      version: 0.1.0
+    - condition: spiffe-csi-driver.enabled
+      name: spiffe-csi-driver
+      repository: file://./charts/spiffe-csi-driver
+      version: 0.1.0
+    - condition: spiffe-oidc-discovery-provider.enabled
+      name: spiffe-oidc-discovery-provider
+      repository: file://./charts/spiffe-oidc-discovery-provider
+      version: 0.1.0
+    description: 'A Helm chart for deploying the complete Cofide SPIRE stack including:
+      spire-server, spire-agent, spiffe-csi-driver, and spiffe-oidc-discovery-provider. '
+    digest: 9d419c83b2d61a7d98490e7db6707b6cf49996f793895f13120cf1074ab0b808
+    home: https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
+    icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
+    keywords:
+    - spiffe
+    - spire
+    - spire-server
+    - spire-agent
+    - oidc
+    - spire-controller-manager
+    kubeVersion: '>=1.21.0-0'
+    maintainers:
+    - name: Cofide
+      url: https://cofide.io
+    name: spire
+    sources:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
+    type: application
+    urls:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-0.27.1-cofide.0/spire-0.27.1-cofide.0.tgz
+    version: 0.27.1-cofide.0
   - annotations:
       artifacthub.io/category: security
       artifacthub.io/license: Apache-2.0
@@ -863,4 +942,4 @@ entries:
     urls:
     - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-nested-0.26.0/spire-nested-0.26.0.tgz
     version: 0.26.0
-generated: "2026-02-25T18:22:41.082703942Z"
+generated: "2026-03-02T13:52:33.452045829Z"
