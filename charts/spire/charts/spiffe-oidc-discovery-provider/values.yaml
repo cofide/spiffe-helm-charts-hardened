@@ -184,7 +184,7 @@ insecureScheme:
       registry: docker.io
       repository: nginxinc/nginx-unprivileged
       pullPolicy: IfNotPresent
-      tag: 1.29.2-alpine
+      tag: 1.29.3-alpine
     ## @param insecureScheme.nginx.ipMode IP modes supported by the cluster. Must be one of [ipv4, ipv6, both]
     ipMode: both
     ## @param insecureScheme.nginx.resources Resource requests and limits
@@ -356,7 +356,7 @@ tests:
       registry: cgr.dev
       repository: chainguard/bash
       pullPolicy: IfNotPresent
-      tag: latest@sha256:d965934bc289d795540aa1204f39b2586cd023cc9deb2695e4e284b21492c77c
+      tag: latest@sha256:a4b8f2ec447f0e2b229d8f41711f9ffd1833f7015d2834046567b75a1a1db507
 
   toolkit:
     ## @param tests.toolkit.image.registry The OCI registry to pull the image from
@@ -368,7 +368,7 @@ tests:
       registry: cgr.dev
       repository: chainguard/min-toolkit-debug
       pullPolicy: IfNotPresent
-      tag: latest@sha256:a24a6a1c506cd9fc5a2a3661294393fafe74b0a3993b11050179081be122b855
+      tag: latest@sha256:0ba70a117710f95ba7d7a9ad0932e920c2785c1bb244ca858cd6445e4526e1f4
 
   step:
     ## @param tests.step.image.registry The OCI registry to pull the image from
@@ -380,7 +380,7 @@ tests:
       registry: "docker.io"
       repository: smallstep/step-cli
       pullPolicy: IfNotPresent
-      tag: 0.28.7
+      tag: 0.29.0
 
   busybox:
     ## @param tests.busybox.image.registry The OCI registry to pull the image from
