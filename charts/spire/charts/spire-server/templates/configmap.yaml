@@ -54,7 +54,9 @@ server:
   trust_domain: {{ include "spire-lib.trust-domain" . | quote }}
   data_dir: "/run/spire/data"
   log_level: {{ .Values.logLevel | quote }}
+  {{- if .Values.logFormat }}
   log_format: {{ .Values.logFormat | quote }}
+  {{- end }}
   jwt_issuer: {{ include "spire-lib.jwt-issuer" . | quote }}
   audit_log_enabled: {{ .Values.auditLogEnabled }}
 
@@ -66,6 +68,13 @@ server:
   {{- end }}
   default_x509_svid_ttl: {{ .Values.defaultX509SvidTTL | quote }}
   default_jwt_svid_ttl: {{ .Values.defaultJwtSvidTTL | quote }}
+
+  {{- if .Values.pruneAttestedNodesExpiredFor }}
+  prune_attested_nodes_expired_for: {{ .Values.pruneAttestedNodesExpiredFor | quote }}
+  {{- end }}
+  {{- if .Values.pruneTOFUNodes }}
+  prune_tofu_nodes: {{ .Values.pruneTOFUNodes }}
+  {{- end }}
 
   ca_subject:
     - country: [{{ include "spire-server.ca-subject-country" . | quote }}]
@@ -98,6 +107,7 @@ server:
     cache_reload_interval: {{ .cacheReloadInterval | quote }}
     events_based_cache: {{ .eventsBasedCache }}
     prune_events_older_than: {{ .pruneEventsOlderThan | quote }}
+    require_pq_kem: {{ .requirePQKEM }}
     {{- if gt (len .featureFlags) 0 }}
     feature_flags:
       {{- range .featureFlags }}
@@ -146,7 +156,7 @@ plugins:
         {{- end }}
         max_open_conns: {{ .Values.dataStore.sql.maxOpenConns }}
         max_idle_conns: {{ .Values.dataStore.sql.maxIdleConns }}
-        {{- if ne (int .Values.dataStore.sql.connMaxLifetime) 0 }}
+        {{- if and .Values.dataStore.sql.connMaxLifetime (ne (toString .Values.dataStore.sql.connMaxLifetime) "0") }}
         conn_max_lifetime: {{ .Values.dataStore.sql.connMaxLifetime }}
         {{- end }}
         disable_migration: {{ .Values.dataStore.sql.disableMigration }}
@@ -291,8 +301,16 @@ plugins:
         {{- if or (ne .keyPolicy.policy "") (ne .keyPolicy.existingConfigMap "") }}
         key_policy_file: "/run/spire/data/aws-kms-key-policy.json"
         {{- end }}
+        {{- with .keyTags }}
+        key_tags:
+          {{- range $key, $value := . }}
+          {{ $key }}: {{ $value | quote }}
+          {{- end }}
+        {{- end }}
   {{- end }}
   {{- end }}
+
+{{- $keyManagerUsed = add $keyManagerUsed (len .Values.unsupportedBuiltInPlugins.keyManager) }}
 
 {{- if ne $keyManagerUsed 1 }}
 {{- fail (printf "You have to enable exactly one Key Manager. There are %d enabled." $keyManagerUsed) }}

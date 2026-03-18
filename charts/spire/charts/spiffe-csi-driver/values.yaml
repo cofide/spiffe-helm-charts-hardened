@@ -91,16 +91,21 @@ serviceAccount:
 ## @param podAnnotations [object] Pod annotations for spiffe-csi-driver
 podAnnotations: {}
 
+## @param podLabels [object] Labels to add to pods
+podLabels: {}
+
 ## @param podSecurityContext [object] Security context for CSI driver pods
 podSecurityContext: {}
   # fsGroup: 2000
 
-## @param securityContext.readOnlyRootFilesystem Flag for read only root filesystem
-## @param securityContext.privileged Flag for specifying privileged mode
+## @param securityContext [object] Security context for CSI driver containers
 ##
 securityContext:
   readOnlyRootFilesystem: true
   privileged: true
+  capabilities:
+    drop:
+      - ALL
   # runAsNonRoot: true
   # runAsUser: 1000
   # capabilities:
@@ -161,4 +166,4 @@ selinux:
     registry: registry.access.redhat.com
     repository: ubi9
     pullPolicy: IfNotPresent
-    tag: 9.7-1763340522
+    tag: 9.7-1771346757
