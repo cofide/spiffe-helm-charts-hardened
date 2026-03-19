@@ -125,6 +125,9 @@ livenessProbe:
 ## @param podAnnotations [object] Pod annotations for Spire OIDC discovery provider
 podAnnotations: {}
 
+## @param podLabels [object] Labels to add to pods
+podLabels: {}
+
 # Select from one of the options below to be the source of certificates for OIDC Discovery Provider.
 # If none are enabled, connections won't be TLS encrypted.
 tls:
@@ -184,7 +187,7 @@ insecureScheme:
       registry: docker.io
       repository: nginxinc/nginx-unprivileged
       pullPolicy: IfNotPresent
-      tag: 1.29.2-alpine
+      tag: 1.29.5-alpine
     ## @param insecureScheme.nginx.ipMode IP modes supported by the cluster. Must be one of [ipv4, ipv6, both]
     ipMode: both
     ## @param insecureScheme.nginx.resources Resource requests and limits
@@ -206,6 +209,8 @@ jwtIssuer: ""
 config:
   ## @param config.logLevel The log level, valid values are "debug", "info", "warn", and "error"
   logLevel: info
+  ## @param config.logFormat The log format, valid values are "text" and "json"
+  logFormat: text
   ## @param config.jwtDomain [string] The JWT domain. Defaults to oidc-discovery.$jwtIssuer URL-parsed host if unset
   jwtDomain: ""
   ## @param config.jwksUri [string] The JWKS URI
@@ -356,7 +361,7 @@ tests:
       registry: cgr.dev
       repository: chainguard/bash
       pullPolicy: IfNotPresent
-      tag: latest@sha256:d965934bc289d795540aa1204f39b2586cd023cc9deb2695e4e284b21492c77c
+      tag: latest@sha256:3a1830320b1d57167a7317fcd6efd8c72cd872440da8055fa25730d600c9c39a
 
   toolkit:
     ## @param tests.toolkit.image.registry The OCI registry to pull the image from
@@ -368,7 +373,7 @@ tests:
       registry: cgr.dev
       repository: chainguard/min-toolkit-debug
       pullPolicy: IfNotPresent
-      tag: latest@sha256:a24a6a1c506cd9fc5a2a3661294393fafe74b0a3993b11050179081be122b855
+      tag: latest@sha256:808212996e8bb2f3a0fa1dfa3e28e5a6687b22a3d8524a2ae2e5d87d7bb71275
 
   step:
     ## @param tests.step.image.registry The OCI registry to pull the image from
@@ -380,7 +385,7 @@ tests:
       registry: "docker.io"
       repository: smallstep/step-cli
       pullPolicy: IfNotPresent
-      tag: 0.28.7
+      tag: 0.29.0
 
   busybox:
     ## @param tests.busybox.image.registry The OCI registry to pull the image from
