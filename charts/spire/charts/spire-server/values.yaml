@@ -1322,7 +1322,7 @@ experimental:
   # Cofide: Optional configuration for the custom JWT signer API
   ## @param experimental.customJwtSigner [object] The cofide-spire custom JWT signing API configuration.
   customJwtSigner:
-    ## @param experimental.customJwtSigner.allowed_ids [array] The list of SPIFFE IDs which are allowed to use the custom JWT signer API.
+    ## @param experimental.customJwtSigner.allowedIDs [array] The list of SPIFFE IDs which are allowed to use the custom JWT signer API.
     allowedIDs: []
 
 
