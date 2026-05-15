@@ -120,6 +120,12 @@ server:
         policy_data_path: /run/spire/config/policy_data.json
         rego_path: /run/spire/config/policy.rego
     {{- end }}
+    {{- /* COFIDE: optional configuration for the custom JWT signer API */}}
+    {{- with .customJwtSigner.allowedIDs }}
+    custom_jwt_signer:
+      allowed_ids:
+        {{ . | toYaml | nindent 8 }}
+    {{- end }}
   {{- end }}
   {{- end }}
 
