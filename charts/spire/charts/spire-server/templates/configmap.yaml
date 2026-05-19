@@ -123,8 +123,7 @@ server:
     {{- /* COFIDE: optional configuration for the custom JWT signer API */}}
     {{- with .customJwtSigner.allowedIDs }}
     custom_jwt_signer:
-      allowed_ids:
-        {{ . | toYaml | nindent 8 }}
+      {{ . | toYaml | nindent 6 }}
     {{- end }}
   {{- end }}
   {{- end }}
