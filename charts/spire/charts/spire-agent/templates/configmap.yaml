@@ -62,6 +62,12 @@ agent:
   trust_bundle_path: {{ printf "/run/spire/bundle/bundle.%s" (include "spire-lib.trust-bundle-ext" (dict "trustBundleFormat" .Values.trustBundleFormat)) | quote }}
   {{- end }}
   trust_domain: {{ include "spire-lib.trust-domain" . | quote }}
+  {{- with .Values.connectURL }}
+  connect_url: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.connectTrustDomain }}
+  connect_trust_domain: {{ . | quote }}
+  {{- end }}
   {{- with .Values.availabilityTarget }}
   availability_target: {{ . | quote }}
   {{- end }}

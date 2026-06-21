@@ -107,6 +107,10 @@ availabilityTarget: ""
 rebootstrapMode: always
 ## @param rebootstrapDelay The agent will rebootstrap after configured amount of time on unknown x509 cert from the server
 rebootstrapDelay: 10m
+## @param connectURL If set, the agent publishes workload SVID issuance events to the Cofide Connect control plane at this address (host:port). Leave empty to disable.
+connectURL: ""
+## @param connectTrustDomain SPIFFE trust domain of the Cofide Connect control plane. Required when connectURL is set.
+connectTrustDomain: ""
 
 ## @skip upstream
 upstream: false
