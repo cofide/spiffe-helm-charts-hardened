@@ -1319,6 +1319,12 @@ experimental:
       policy_data: ""
       ## @param experimental.authOpaPolicyEngine.local.rego [string] The contents of a rego policy file defining how to authorize the API calls.
       rego: ""
+  # Cofide: Optional configuration for the custom JWT signer API
+  ## @param experimental.customJwtSigner [object] The Cofide SPIRE custom JWT signing API configuration.
+  customJwtSigner:
+    ## @param experimental.customJwtSigner.allowedIDs [array] The list of SPIFFE IDs which are allowed to use the custom JWT signer API.
+    allowedIDs: []
+
 
 tests:
   ## @param tests.hostAliases [array] List of host aliases for testing

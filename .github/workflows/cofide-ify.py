@@ -5,7 +5,6 @@
 # The resulting changes should not be committed to the repository to avoid a
 # significant divergence from upstream SPIRE and resulting maintenance burden.
 
-import contextlib
 import pathlib
 from ruamel.yaml import YAML
 import shutil
