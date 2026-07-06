@@ -14,7 +14,10 @@ yaml.indent(sequence=4, offset=2)
 yaml.line_width = 4096
 yaml.preserve_quotes = True
 
-CHARTS_TO_RM = ["spire-nested"]
+CHARTS_TO_RM = [
+    "spire-nested",
+    "spiffe-step-ssh",
+]
 SUBCHARTS_TO_RM = {
     "spire": [
         "spike-keeper",
