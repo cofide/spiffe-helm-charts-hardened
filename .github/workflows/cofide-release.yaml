@@ -19,6 +19,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+
       - name: Install ruamel.yaml
         run: |
           pip install ruamel.yaml
