@@ -8,6 +8,7 @@
 import pathlib
 from ruamel.yaml import YAML
 import shutil
+import subprocess
 
 yaml = YAML()
 yaml.indent(sequence=4, offset=2)
@@ -68,6 +69,16 @@ def main():
 
     for chart, aliases in ALIASES_TO_RM.items():
         filter_chart_deps(chart, lambda dep: dep.get("alias") not in aliases)
+
+    # Re-sync Chart.lock with the filtered dependencies, otherwise it goes
+    # out of sync with Chart.yaml and chart-releaser refuses to package it.
+    changed_charts = set(SUBCHARTS_TO_RM) | set(ALIASES_TO_RM)
+    for chart in changed_charts:
+        print(f"Updating dependency lock for chart {chart}")
+        subprocess.run(
+            ["helm", "dependency", "update", "--skip-refresh", str(pathlib.Path("charts", chart))],
+            check=True,
+        )
 
 
 if __name__ == "__main__":
