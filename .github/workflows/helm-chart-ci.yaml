@@ -30,6 +30,10 @@ env:
   PYTHON_VERSION: 3.11.3
   KIND_VERSION: v0.24.0
   CHART_TESTING_VERSION: v3.8.0
+  # Cofide: used to assume an AWS IAM role via OIDC to pull the private cofide/spire-agent
+  # and cofide/spire-server images from ECR (see the "Login to Amazon ECR" steps below).
+  AWS_REGION: eu-west-1
+  AWS_ACCOUNT_ID: "010438484483"
 
 jobs:
   checks:
@@ -37,7 +41,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
 
       - name: Verify Docs updated
         run: ./helm-docs.sh
@@ -78,14 +82,14 @@ jobs:
           fi
 
       - name: Setup Go
-        uses: actions/setup-go@v6.4.0
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           go-version-file: tests/go.mod
           cache-dependency-path: tests/go.sum
           check-latest: true
 
       - name: Set up Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.HELM_VERSION }}
 
@@ -107,22 +111,22 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.HELM_VERSION }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup chart-testing
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f # v2.8.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.CHART_TESTING_VERSION }}
 
@@ -131,6 +135,11 @@ jobs:
 
   test:
     runs-on: ubuntu-22.04
+
+    # Cofide: required to assume the AWS IAM role below via OIDC.
+    permissions:
+      id-token: write
+      contents: read
 
     needs:
       - lint-chart
@@ -149,27 +158,53 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.HELM_VERSION }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Setup chart-testing
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f # v2.8.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.CHART_TESTING_VERSION }}
 
+      # Cofide: authenticate to our private ECR registry so kubelet can pull the
+      # cofide/spire-agent and cofide/spire-server images that the charts default to.
+      # The resulting docker credentials are mounted into the kind nodes as
+      # /var/lib/kubelet/config.json (see .github/kind/conf/kind-config.yaml), so no
+      # imagePullSecret is needed.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # v6.2.2 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/cofide-spiffe-helm-charts-hardened-gh-actions
+          role-session-name: spiffe-helm-charts-hardened-gh-actions
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@d539f0932e70871a027e9d5a9d8fc38589180a64 # v2.1.6 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+
+      # Cofide: the AWS credentials above are only needed to log in to ECR; clear them from
+      # the job environment before later steps run PR-supplied scripts/charts, so those
+      # can't read or exfiltrate them.
+      - name: Clear AWS credentials from job environment
+        run: |
+          {
+            echo "AWS_ACCESS_KEY_ID="
+            echo "AWS_SECRET_ACCESS_KEY="
+            echo "AWS_SESSION_TOKEN="
+          } >> "$GITHUB_ENV"
+
       - name: Create kind ${{ matrix.k8s }} cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         # Only build a kind cluster if there are chart changes to test.
         with:
           version: ${{ env.KIND_VERSION }}
@@ -201,7 +236,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
 
       - id: set-matrix-example
         name: Collect all examples
@@ -226,6 +261,11 @@ jobs:
   example-test:
     runs-on: ubuntu-22.04
 
+    # Cofide: required to assume the AWS IAM role below via OIDC.
+    permissions:
+      id-token: write
+      contents: read
+
     needs:
       - lint-chart
       - build-matrix
@@ -242,20 +282,46 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
 
       - name: Set up Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.HELM_VERSION }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      # Cofide: authenticate to our private ECR registry so kubelet can pull the
+      # cofide/spire-agent and cofide/spire-server images that the charts default to.
+      # The resulting docker credentials are mounted into the kind nodes as
+      # /var/lib/kubelet/config.json (see .github/kind/conf/kind-config.yaml), so no
+      # imagePullSecret is needed.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # v6.2.2 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/cofide-spiffe-helm-charts-hardened-gh-actions
+          role-session-name: spiffe-helm-charts-hardened-gh-actions
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@d539f0932e70871a027e9d5a9d8fc38589180a64 # v2.1.6 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+
+      # Cofide: the AWS credentials above are only needed to log in to ECR; clear them from
+      # the job environment before later steps run PR-supplied scripts/charts, so those
+      # can't read or exfiltrate them.
+      - name: Clear AWS credentials from job environment
+        run: |
+          {
+            echo "AWS_ACCESS_KEY_ID="
+            echo "AWS_SECRET_ACCESS_KEY="
+            echo "AWS_SESSION_TOKEN="
+          } >> "$GITHUB_ENV"
+
       - name: Create kind cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         # Only build a kind cluster if there are chart changes to test.
         with:
           version: ${{ env.KIND_VERSION }}
@@ -281,6 +347,11 @@ jobs:
   integration-test:
     runs-on: ubuntu-22.04
 
+    # Cofide: required to assume the AWS IAM role below via OIDC.
+    permissions:
+      id-token: write
+      contents: read
+
     needs:
       - lint-chart
       - build-matrix
@@ -297,20 +368,46 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
 
       - name: Set up Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.HELM_VERSION }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      # Cofide: authenticate to our private ECR registry so kubelet can pull the
+      # cofide/spire-agent and cofide/spire-server images that the charts default to.
+      # The resulting docker credentials are mounted into the kind nodes as
+      # /var/lib/kubelet/config.json (see .github/kind/conf/kind-config.yaml), so no
+      # imagePullSecret is needed.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # v6.2.2 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/cofide-spiffe-helm-charts-hardened-gh-actions
+          role-session-name: spiffe-helm-charts-hardened-gh-actions
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@d539f0932e70871a027e9d5a9d8fc38589180a64 # v2.1.6 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+
+      # Cofide: the AWS credentials above are only needed to log in to ECR; clear them from
+      # the job environment before later steps run PR-supplied scripts/charts, so those
+      # can't read or exfiltrate them.
+      - name: Clear AWS credentials from job environment
+        run: |
+          {
+            echo "AWS_ACCESS_KEY_ID="
+            echo "AWS_SECRET_ACCESS_KEY="
+            echo "AWS_SESSION_TOKEN="
+          } >> "$GITHUB_ENV"
+
       - name: Create kind cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         # Only build a kind cluster if there are chart changes to test.
         with:
           version: ${{ env.KIND_VERSION }}
@@ -329,6 +426,11 @@ jobs:
   upgrade-test:
     runs-on: ubuntu-22.04
 
+    # Cofide: required to assume the AWS IAM role below via OIDC.
+    permissions:
+      id-token: write
+      contents: read
+
     needs:
       - lint-chart
       - build-matrix
@@ -343,20 +445,46 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
 
       - name: Set up Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           version: ${{ env.HELM_VERSION }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      # Cofide: authenticate to our private ECR registry so kubelet can pull the
+      # cofide/spire-agent and cofide/spire-server images that the charts default to.
+      # The resulting docker credentials are mounted into the kind nodes as
+      # /var/lib/kubelet/config.json (see .github/kind/conf/kind-config.yaml), so no
+      # imagePullSecret is needed.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@517a711dbcd0e402f90c77e7e2f81e849156e31d # v6.2.2 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/cofide-spiffe-helm-charts-hardened-gh-actions
+          role-session-name: spiffe-helm-charts-hardened-gh-actions
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@d539f0932e70871a027e9d5a9d8fc38589180a64 # v2.1.6 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
+
+      # Cofide: the AWS credentials above are only needed to log in to ECR; clear them from
+      # the job environment before later steps run PR-supplied scripts/charts, so those
+      # can't read or exfiltrate them.
+      - name: Clear AWS credentials from job environment
+        run: |
+          {
+            echo "AWS_ACCESS_KEY_ID="
+            echo "AWS_SECRET_ACCESS_KEY="
+            echo "AWS_SESSION_TOKEN="
+          } >> "$GITHUB_ENV"
+
       - name: Create kind cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0 -- Cofide: pinned to commit SHA to guard against a compromised/re-tagged action
         # Only build a kind cluster if there are chart changes to test.
         with:
           version: ${{ env.KIND_VERSION }}
