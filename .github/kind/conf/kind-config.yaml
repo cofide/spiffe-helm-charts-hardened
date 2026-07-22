@@ -16,20 +16,12 @@ kubeadmConfigPatches:
 nodes:
   - role: control-plane
     extraMounts:
-      # Cofide: reuse the runner's ECR-authenticated docker credentials so kubelet can
-      # pull the private cofide/spire-agent and cofide/spire-server images without an
-      # imagePullSecret. Populated by the "Login to Amazon ECR" CI step.
-      - hostPath: /home/runner/.docker/config.json
-        containerPath: /var/lib/kubelet/config.json
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-b/public
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-server-b/public
   - role: worker
     extraMounts:
-      # Cofide: see the control-plane node above.
-      - hostPath: /home/runner/.docker/config.json
-        containerPath: /var/lib/kubelet/config.json
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-b/public
@@ -40,9 +32,6 @@ nodes:
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-agent-b/public
   - role: worker
     extraMounts:
-      # Cofide: see the control-plane node above.
-      - hostPath: /home/runner/.docker/config.json
-        containerPath: /var/lib/kubelet/config.json
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-b/public
@@ -53,9 +42,6 @@ nodes:
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-agent-b/public
   - role: worker
     extraMounts:
-      # Cofide: see the control-plane node above.
-      - hostPath: /home/runner/.docker/config.json
-        containerPath: /var/lib/kubelet/config.json
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
         containerPath: /var/run/spiffe/socat/unix/k8s-spire-server-a/public
       - hostPath: /var/run/spiffe/socat/unix/k8s-spire-server-b/public
