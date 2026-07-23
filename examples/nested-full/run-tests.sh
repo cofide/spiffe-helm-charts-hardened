@@ -72,6 +72,12 @@ for cluster in child other; do
 
   kind create cluster --name "${cluster}" --kubeconfig "${SCRIPTPATH}/kubeconfig-${cluster}" --config "${SCRIPTPATH}/.test-files/${cluster}-kind-config.yaml" --image "kindest/node:${K8S}"
 
+  # Cofide: pull the private cofide/spire-server and cofide/spire-agent images once and
+  # load them into this cluster's nodes directly, rather than relying on each node to
+  # pull them live from ECR (which has been observed to occasionally take minutes
+  # instead of seconds and blow through a helm --wait timeout).
+  "${SCRIPTPATH}/../../.github/scripts/load-spire-images.sh" "${cluster}"
+
   kubectl version --kubeconfig "${SCRIPTPATH}/kubeconfig-${cluster}"
   md5sum "${KC}"
   wc -l "${KC}"

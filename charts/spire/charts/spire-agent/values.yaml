@@ -12,10 +12,10 @@ global: {}
 ## @param image.tag Overrides the image tag whose default is the chart appVersion
 ##
 image:
-  registry: ghcr.io
-  repository: spiffe/spire-agent
+  registry: 010438484483.dkr.ecr.eu-west-1.amazonaws.com
+  repository: cofide/spire-agent
   pullPolicy: IfNotPresent
-  tag: ""
+  tag: v1.15.1-cofide.0
 
 ## @param imagePullSecrets [array] Pull secrets for images
 imagePullSecrets: []

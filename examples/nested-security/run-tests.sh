@@ -76,6 +76,12 @@ for cluster in child; do
   md5sum "${KC}"
   wc -l "${KC}"
 
+  # Cofide: pull the private cofide/spire-server and cofide/spire-agent images once and
+  # load them into this cluster's nodes directly, rather than relying on each node to
+  # pull them live from ECR (which has been observed to occasionally take minutes
+  # instead of seconds and blow through a helm --wait timeout).
+  "${SCRIPTPATH}/../../.github/scripts/load-spire-images.sh" "${cluster}"
+
   helm upgrade --kubeconfig "${KC}" --install --create-namespace --namespace spire-mgmt spire-crds charts/spire-crds
   helm upgrade --kubeconfig "${KC}" --install --namespace spire-mgmt --values "${COMMON_TEST_YOUR_VALUES},${SCRIPTPATH}/child-values.yaml" \
     --set "downstream-spire-agent-security.server.address=spire-server.production.other" \
