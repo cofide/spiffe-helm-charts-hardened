@@ -73,8 +73,8 @@ agent:
   {{- with .Values.cofideConnect }}
   {{- if eq (.enableWorkloadEvents | toString) "true" }}
   cofide_connect:
-    address: {{ .address | quote }}
-    server_name: {{ .serverName | quote }}
+    mtls_grpc_target: {{ .mtlsGRPCTarget | quote }}
+    mtls_server_name: {{ .mtlsServerName | quote }}
     spiffe_id: {{ .spiffeId | quote }}
     enable_workload_events: true
   {{- end }}

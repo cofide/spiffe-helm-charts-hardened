@@ -107,14 +107,14 @@ availabilityTarget: ""
 rebootstrapMode: always
 ## @param rebootstrapDelay The agent will rebootstrap after configured amount of time on unknown x509 cert from the server
 rebootstrapDelay: 10m
-## @param cofideConnect.enableWorkloadEvents If true, the agent publishes workload SVID issuance events to the Cofide Connect control plane. address, serverName and spiffeId must all be set.
-## @param cofideConnect.address Hostname:port of the Cofide Connect control plane API.
-## @param cofideConnect.serverName SNI of the Cofide Connect control plane API.
+## @param cofideConnect.enableWorkloadEvents If true, the agent publishes workload SVID issuance events to the Cofide Connect control plane. mtlsGRPCTarget and spiffeId must all be set.
+## @param cofideConnect.mtlsGRPCTarget gRCP target of Cofide Connect control plane API (secured using SPIFFE mTLS).
+## @param cofideConnect.mtlsServerName SNI to use when calling the Cofide Connect control plane API. If not set it will be automatically set based upon the gRPC target.
 ## @param cofideConnect.spiffeId SPIFFE ID of the Cofide Connect control plane API.
 cofideConnect:
   enableWorkloadEvents: false
-  address: ""
-  serverName: ""
+  mtlsGRPCTarget: ""
+  mtlsServerName: ""
   spiffeId: ""
 
 ## @skip upstream
