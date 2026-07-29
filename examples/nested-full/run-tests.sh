@@ -45,8 +45,7 @@ teardown() {
 
 trap 'EC=$? && trap - SIGTERM && teardown $EC' SIGINT SIGTERM EXIT
 
-# Update deps
-helm dep up charts/spire-nested
+"${SCRIPTPATH}/../../.github/scripts/prepare-local-chart-deps.sh"
 
 # List nodes
 kubectl get nodes
@@ -72,6 +71,12 @@ for cluster in child other; do
   KC="${SCRIPTPATH}/kubeconfig-${cluster}"
 
   kind create cluster --name "${cluster}" --kubeconfig "${SCRIPTPATH}/kubeconfig-${cluster}" --config "${SCRIPTPATH}/.test-files/${cluster}-kind-config.yaml" --image "kindest/node:${K8S}"
+
+  # Cofide: pull the private cofide/spire-server and cofide/spire-agent images once and
+  # load them into this cluster's nodes directly, rather than relying on each node to
+  # pull them live from ECR (which has been observed to occasionally take minutes
+  # instead of seconds and blow through a helm --wait timeout).
+  "${SCRIPTPATH}/../../.github/scripts/load-spire-images.sh" "${cluster}"
 
   kubectl version --kubeconfig "${SCRIPTPATH}/kubeconfig-${cluster}"
   md5sum "${KC}"
@@ -136,4 +141,3 @@ helm test --namespace spire-mgmt spire
 
 helm test --kubeconfig "${SCRIPTPATH}/kubeconfig-child" --namespace spire-mgmt spire
 helm test --kubeconfig "${SCRIPTPATH}/kubeconfig-other" --namespace spire-mgmt spire
-
