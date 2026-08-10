@@ -18,7 +18,7 @@ image:
   registry: 010438484483.dkr.ecr.eu-west-1.amazonaws.com
   repository: cofide/spire-server
   pullPolicy: IfNotPresent
-  tag: v1.15.1-cofide.0
+  tag: v1.15.1-cofide.1
 
 ## @param kind Define SPIRE server deployment type. Can be statefulset/deployment. Defaults to statefulset if not set. This feature is experimental.
 kind: statefulset
@@ -228,10 +228,20 @@ dataStore:
         ## @param dataStore.sql.readOnly.externalSecret.key The key of the secret object whose value is the dataStore.sql password
         key: ""
   connect:
-    ## @param dataStore.connect.url The URL of Cofide Connect API.
+    ## @param dataStore.connect.url Deprecated: The URL of Cofide Connect API. Deprecated in favour of tlsGRPCTarget/mtlsGRPCTarget; still used as a fallback to derive those values when they are unset.
     url: ""
-    ## @param dataStore.connect.trustDomain The trust domain of Cofide Connect API.
+    ## @param dataStore.connect.trustDomain Deprecated: The trust domain of Cofide Connect API. Deprecated in favour of spiffeID; still used as a fallback to derive spiffeID when it is unset.
     trustDomain: ""
+    ## @param dataStore.connect.tlsGRPCTarget The gRPC dial target for the non-mTLS path to Cofide Connect API. Required (along with mtlsGRPCTarget) unless url is set.
+    tlsGRPCTarget: ""
+    ## @param dataStore.connect.tlsGRPCServerName The TLS server name (authority) to use for the non-mTLS path to Cofide Connect API. Optional; defaults to tlsGRPCTarget.
+    tlsGRPCServerName: ""
+    ## @param dataStore.connect.mtlsGRPCTarget The gRPC dial target for the mTLS path to Cofide Connect API. Required (along with tlsGRPCTarget) unless url is set.
+    mtlsGRPCTarget: ""
+    ## @param dataStore.connect.mtlsGRPCServerName The TLS server name (authority) to use for the mTLS path to Cofide Connect API. Optional; defaults to mtlsGRPCTarget.
+    mtlsGRPCServerName: ""
+    ## @param dataStore.connect.spiffeID The full SPIFFE ID of the Cofide Connect API. Required unless trustDomain is set.
+    spiffeID: ""
     ## @param dataStore.connect.bundleEndpointURL The URL to fetch the trust bundle for Cofide Connect API from. Must be trusted HTTPS for security.
     bundleEndpointURL: ""
     ## @param dataStore.connect.trustZoneServerID The Trust Zone Server ID to use when connecting to Cofide Connect API. Either this or clusterID must be provided.
@@ -245,7 +255,7 @@ dataStore:
       method: psat
       ## @param dataStore.connect.auth.psatExpirationSeconds The expiration time in seconds for the PSAT when auth.method is "psat".
       psatExpirationSeconds: 900
-      ## @param dataStore.connect.auth.psatAudience Override the audience to use for the PSAT when auth.method is "psat". The default is the connect.url.
+      ## @param dataStore.connect.auth.psatAudience Override the audience to use for the PSAT when auth.method is "psat". Defaults to dataStore.connect.tlsGRPCTarget if set, otherwise dataStore.connect.url; required if neither is set.
       psatAudience: ""
       ## @param dataStore.connect.auth.joinToken The join token to use when auth.method is "join_token".
       joinToken: ""
