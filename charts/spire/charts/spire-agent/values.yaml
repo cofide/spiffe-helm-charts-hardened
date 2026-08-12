@@ -15,7 +15,7 @@ image:
   registry: 010438484483.dkr.ecr.eu-west-1.amazonaws.com
   repository: cofide/spire-agent
   pullPolicy: IfNotPresent
-  tag: v1.15.1-cofide.0
+  tag: v1.15.1-cofide.2
 
 ## @param imagePullSecrets [array] Pull secrets for images
 imagePullSecrets: []
