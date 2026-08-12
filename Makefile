@@ -7,9 +7,14 @@ help: ## Display this help.
 ##@ Linting:
 
 .PHONY: lint
+# Cofide: upstream passes --check-version-increment=false here, because upstream only
+# bumps chart versions at release time. We release from main (see
+# .github/workflows/cofide-release.yaml), and chart-releaser silently skips a chart whose
+# version has already been released, so a PR that changes a chart without bumping its
+# version would never get published. Keep the check enabled to catch that in CI.
 lint: ## Lint the charts using chart-testing
 	@echo Linting charts…
-	@ct lint --config ct.yaml --target-branch $(TARGET_BRANCH) --check-version-increment=false
+	@ct lint --config ct.yaml --target-branch $(TARGET_BRANCH) --check-version-increment=true
 
 lint-release: ## Lint the charts using chart-testing for release
 	@echo Linting charts…

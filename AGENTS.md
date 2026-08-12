@@ -25,6 +25,9 @@ This file is a lightweight working guide for Codex and human contributors in thi
 ## Working Agreements
 
 - Do not bump chart versions as part of normal contributions; maintainers handle release versioning
+  - Cofide: this does not apply to this fork. We publish charts from `main`, and chart-releaser
+    silently skips a chart whose version was already released, so bump the `version` in the
+    `Chart.yaml` of every chart you change. `make lint` in CI enforces this.
 - If you change `Chart.yaml` or `values.yaml`, regenerate docs with `./helm-docs.sh`
 - Prefer focused changes to a single chart or feature area per branch
 - Preserve existing Helm templating patterns and values structure unless the task requires a broader refactor
