@@ -65,11 +65,11 @@
 {{-   end }}
 {{- end }}
 {{- if eq .Values.dataStore.plugin "connect" }}
-{{-   if not .Values.dataStore.connect.url }}
-{{-     fail "dataStore.connect.url must be set when using connect data store." }}
+{{-   if and (not .Values.dataStore.connect.url) (or (not .Values.dataStore.connect.tlsGRPCTarget) (not .Values.dataStore.connect.mtlsGRPCTarget)) }}
+{{-     fail "dataStore.connect.url is deprecated; dataStore.connect.tlsGRPCTarget and dataStore.connect.mtlsGRPCTarget must both be set when it is unset." }}
 {{-   end }}
-{{-   if not .Values.dataStore.connect.trustDomain }}
-{{-     fail "dataStore.connect.trustDomain must be set when using connect data store." }}
+{{-   if and (not .Values.dataStore.connect.trustDomain) (not .Values.dataStore.connect.spiffeID) }}
+{{-     fail "dataStore.connect.trustDomain is deprecated; dataStore.connect.spiffeID must be set when it is unset." }}
 {{-   end }}
 {{-   if not .Values.dataStore.connect.bundleEndpointURL }}
 {{-     fail "dataStore.connect.bundleEndpointURL must be set when using connect data store." }}
@@ -88,6 +88,9 @@
 {{-   else if eq $authMethod "psat" }}
 {{-     if .Values.dataStore.connect.auth.joinToken }}
 {{-       fail "dataStore.connect.auth.joinToken must NOT be set when using psat authentication method." }}
+{{-     end }}
+{{-     if and (not .Values.dataStore.connect.url) (not .Values.dataStore.connect.tlsGRPCTarget) (not .Values.dataStore.connect.auth.psatAudience) }}
+{{-       fail "dataStore.connect.auth.psatAudience must be set when using psat authentication method without dataStore.connect.url or dataStore.connect.tlsGRPCTarget." }}
 {{-     end }}
 {{-   else }}
 {{-     fail (printf "Unsupported dataStore.connect.auth.method %q. Supported methods are [\"psat\", \"join_token\"]" $authMethod) }}
@@ -341,6 +344,16 @@ spec:
             value: {{ .Values.dataStore.connect.url | quote }}
           - name: COFIDE_CONNECT_TRUST_DOMAIN
             value: {{ .Values.dataStore.connect.trustDomain | quote }}
+          - name: COFIDE_CONNECT_TLS_GRPC_TARGET
+            value: {{ .Values.dataStore.connect.tlsGRPCTarget | quote }}
+          - name: COFIDE_CONNECT_TLS_SERVER_NAME
+            value: {{ .Values.dataStore.connect.tlsGRPCServerName | quote }}
+          - name: COFIDE_CONNECT_MTLS_GRPC_TARGET
+            value: {{ .Values.dataStore.connect.mtlsGRPCTarget | quote }}
+          - name: COFIDE_CONNECT_MTLS_SERVER_NAME
+            value: {{ .Values.dataStore.connect.mtlsGRPCServerName | quote }}
+          - name: COFIDE_CONNECT_SPIFFE_ID
+            value: {{ .Values.dataStore.connect.spiffeID | quote }}
           - name: COFIDE_CONNECT_BUNDLE_ENDPOINT_URL
             value: {{ .Values.dataStore.connect.bundleEndpointURL | quote }}
           {{- if .Values.dataStore.connect.trustZoneServerID }}
