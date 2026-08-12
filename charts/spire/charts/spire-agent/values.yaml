@@ -15,7 +15,7 @@ image:
   registry: 010438484483.dkr.ecr.eu-west-1.amazonaws.com
   repository: cofide/spire-agent
   pullPolicy: IfNotPresent
-  tag: v1.15.1-cofide.0
+  tag: v1.15.1-cofide.2
 
 ## @param imagePullSecrets [array] Pull secrets for images
 imagePullSecrets: []
@@ -107,6 +107,15 @@ availabilityTarget: ""
 rebootstrapMode: always
 ## @param rebootstrapDelay The agent will rebootstrap after configured amount of time on unknown x509 cert from the server
 rebootstrapDelay: 10m
+## @param cofideConnect.enableWorkloadEvents If true, the agent publishes workload SVID issuance events to the Cofide Connect control plane. mtlsGRPCTarget and spiffeId must all be set.
+## @param cofideConnect.mtlsGRPCTarget gRCP target of Cofide Connect control plane API (secured using SPIFFE mTLS).
+## @param cofideConnect.mtlsServerName SNI to use when calling the Cofide Connect control plane API. If not set it will be automatically set based upon the gRPC target.
+## @param cofideConnect.spiffeId SPIFFE ID of the Cofide Connect control plane API.
+cofideConnect:
+  enableWorkloadEvents: false
+  mtlsGRPCTarget: ""
+  mtlsServerName: ""
+  spiffeId: ""
 
 ## @skip upstream
 upstream: false
