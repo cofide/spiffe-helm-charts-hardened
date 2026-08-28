@@ -255,7 +255,7 @@ dataStore:
       method: psat
       ## @param dataStore.connect.auth.psatExpirationSeconds The expiration time in seconds for the PSAT when auth.method is "psat".
       psatExpirationSeconds: 900
-      ## @param dataStore.connect.auth.psatAudience The audience to use for the PSAT when auth.method is "psat". Defaults to dataStore.connect.url if set; required if dataStore.connect.url is unset.
+      ## @param dataStore.connect.auth.psatAudience The audience to use for the PSAT when auth.method is "psat". Must match connect.connectPSATAudience in the Cofide Connect chart. Defaults to dataStore.connect.url if set; required if dataStore.connect.url is unset.
       psatAudience: ""
       ## @param dataStore.connect.auth.joinToken The join token to use when auth.method is "join_token".
       joinToken: ""
