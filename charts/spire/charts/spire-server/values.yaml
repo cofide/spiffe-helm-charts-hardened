@@ -255,7 +255,7 @@ dataStore:
       method: psat
       ## @param dataStore.connect.auth.psatExpirationSeconds The expiration time in seconds for the PSAT when auth.method is "psat".
       psatExpirationSeconds: 900
-      ## @param dataStore.connect.auth.psatAudience Override the audience to use for the PSAT when auth.method is "psat". Defaults to dataStore.connect.tlsGRPCTarget if set, otherwise dataStore.connect.url; required if neither is set.
+      ## @param dataStore.connect.auth.psatAudience The audience to use for the PSAT when auth.method is "psat". Defaults to dataStore.connect.url if set; required if dataStore.connect.url is unset.
       psatAudience: ""
       ## @param dataStore.connect.auth.joinToken The join token to use when auth.method is "join_token".
       joinToken: ""
