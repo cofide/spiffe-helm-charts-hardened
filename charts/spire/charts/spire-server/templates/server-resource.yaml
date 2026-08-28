@@ -89,8 +89,8 @@
 {{-     if .Values.dataStore.connect.auth.joinToken }}
 {{-       fail "dataStore.connect.auth.joinToken must NOT be set when using psat authentication method." }}
 {{-     end }}
-{{-     if and (not .Values.dataStore.connect.url) (not .Values.dataStore.connect.tlsGRPCTarget) (not .Values.dataStore.connect.auth.psatAudience) }}
-{{-       fail "dataStore.connect.auth.psatAudience must be set when using psat authentication method without dataStore.connect.url or dataStore.connect.tlsGRPCTarget." }}
+{{-     if and (not .Values.dataStore.connect.url) (not .Values.dataStore.connect.auth.psatAudience) }}
+{{-       fail "dataStore.connect.auth.psatAudience must be set when using psat authentication method without dataStore.connect.url." }}
 {{-     end }}
 {{-   else }}
 {{-     fail (printf "Unsupported dataStore.connect.auth.method %q. Supported methods are [\"psat\", \"join_token\"]" $authMethod) }}
