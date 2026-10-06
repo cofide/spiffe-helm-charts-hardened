@@ -309,6 +309,19 @@ Create the name of the service account to use
     {{- $has = true -}}
   {{- end -}}
 {{- end -}}
+{{/* NOTE: unsupportedBuiltInPlugins don't follow the same config structure as
+built-in ones. For example, EJBCA plugin doesn't include an 'enabled' key,
+so the presence of its key means it is enabled. When a plugin does have an
+'enabled' key, honor its value. */}}
+{{- range $plugin := .Values.unsupportedBuiltInPlugins.upstreamAuthority -}}
+  {{- if and (kindIs "map" $plugin) (hasKey $plugin "enabled") -}}
+    {{- if eq (get $plugin "enabled" | toString) "true" -}}
+      {{- $has = true -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $has = true -}}
+  {{- end -}}
+{{- end -}}
 {{ ternary "true" "" $has }}
 {{- end }}
 
