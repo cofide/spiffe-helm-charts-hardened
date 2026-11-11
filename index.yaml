@@ -68,6 +68,56 @@ entries:
       org.opencontainers.image.source: https://github.com/spiffe/helm-charts-hardened
     apiVersion: v2
     appVersion: 1.14.5
+    created: "2026-11-11T15:01:31.168806493Z"
+    dependencies:
+    - name: spire-lib
+      repository: file://../spire-lib
+      version: 0.2.0
+    - condition: spire-server.enabled
+      name: spire-server
+      repository: file://./charts/spire-server
+      version: 0.1.0
+    - condition: spire-agent.enabled
+      name: spire-agent
+      repository: file://./charts/spire-agent
+      version: 0.1.0
+    - condition: spiffe-csi-driver.enabled
+      name: spiffe-csi-driver
+      repository: file://./charts/spiffe-csi-driver
+      version: 0.1.0
+    - condition: spiffe-oidc-discovery-provider.enabled
+      name: spiffe-oidc-discovery-provider
+      repository: file://./charts/spiffe-oidc-discovery-provider
+      version: 0.1.0
+    description: 'A Helm chart for deploying the complete Cofide SPIRE stack including:
+      spire-server, spire-agent, spiffe-csi-driver, and spiffe-oidc-discovery-provider. '
+    digest: 893fe0c7363d8049273f24b00ee2c22a519af53547d4cce0bf024168de56ba88
+    home: https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
+    icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
+    keywords:
+    - spiffe
+    - spire
+    - spire-server
+    - spire-agent
+    - oidc
+    - spire-controller-manager
+    kubeVersion: '>=1.21.0-0'
+    maintainers:
+    - name: Cofide
+      url: https://cofide.io
+    name: spire
+    sources:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/tree/main/charts/spire
+    type: application
+    urls:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-0.29.0-cofide.7/spire-0.29.0-cofide.7.tgz
+    version: 0.29.0-cofide.7
+  - annotations:
+      artifacthub.io/category: security
+      artifacthub.io/license: Apache-2.0
+      org.opencontainers.image.source: https://github.com/spiffe/helm-charts-hardened
+    apiVersion: v2
+    appVersion: 1.14.5
     created: "2026-10-21T09:31:31.415305539Z"
     dependencies:
     - name: spire-lib
@@ -1364,6 +1414,35 @@ entries:
   spire-ha-agent:
   - apiVersion: v2
     appVersion: 0.0.17
+    created: "2026-11-11T15:01:31.342607817Z"
+    dependencies:
+    - name: spire-lib
+      repository: file://../spire-lib
+      version: 0.2.0
+    description: A Helm chart to install the SPIRE HA agent.
+    digest: 5715d9cb1cb163e5428ab28c8b400340d38663fe910baf8c6707d9ff1574a540
+    home: https://github.com/spiffe/helm-charts-hardened/tree/main/charts/spire-ha-agent
+    icon: https://spiffe.io/img/logos/spire/icon/color/spire-icon-color.png
+    keywords:
+    - spiffe
+    - spire-ha-agent
+    maintainers:
+    - email: marco.franssen@gmail.com
+      name: marcofranssen
+      url: https://marcofranssen.nl
+    - email: Kevin.Fox@pnnl.gov
+      name: kfox1111
+    - email: fymemon@yahoo.com
+      name: faisal-memon
+    name: spire-ha-agent
+    sources:
+    - https://github.com/spiffe/helm-charts-hardened/tree/main/charts/spire
+    type: application
+    urls:
+    - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-ha-agent-0.2.1-cofide.1/spire-ha-agent-0.2.1-cofide.1.tgz
+    version: 0.2.1-cofide.1
+  - apiVersion: v2
+    appVersion: 0.0.17
     created: "2026-07-07T08:56:41.204716602Z"
     dependencies:
     - name: spire-lib
@@ -1551,4 +1630,4 @@ entries:
     urls:
     - https://github.com/cofide/spiffe-helm-charts-hardened/releases/download/spire-nested-0.26.0/spire-nested-0.26.0.tgz
     version: 0.26.0
-generated: "2026-10-21T09:31:31.41553594Z"
+generated: "2026-11-11T15:01:31.34296678Z"
