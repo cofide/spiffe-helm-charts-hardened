@@ -169,4 +169,4 @@ selinux:
     registry: registry.access.redhat.com
     repository: ubi10/ubi-minimal
     pullPolicy: IfNotPresent
-    tag: 10.1-1776834797
+    tag: 10.2-1794227009
